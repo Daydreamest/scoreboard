@@ -64,6 +64,20 @@ On the first execution Cargo may download dependencies and libraries. After that
 
 ### Usage
 
+#### As Rust source code
+
+Copy the `scoreboard.rs` file to your project and include the module anywhere you need it with:
+
+`use scoreboard::*;`
+
+There is an exmaple proved in `scoreboard/src/bin/example.rs` that shows typical usage of the library.
+
+#### As compiled Rust library with rustc compiler
+
+Copy compiled `libscoreboard.rlib` file to your project and add a flag to your compilation options:
+
+`rustc main.rs --extern scoreboard=libscoreboard.rlib`
+
 ### Testing
 
 To run tests move to the "scoreboard" directory and run:
