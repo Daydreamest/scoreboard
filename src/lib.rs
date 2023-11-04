@@ -30,6 +30,7 @@ impl ScoreBoard {
 				away_team : Team { name: away_name, score: 0 }
 			}
 		);
+
 		Ok(())
 	}
 
@@ -43,12 +44,11 @@ impl ScoreBoard {
 		Ok(())
 	}
 
-	pub fn get_summary(text: String) -> i32 {
-		println!("Function get_summary called with parameter '{}'", text);
-		return 0;
+	pub fn get_summary(&self) -> Vec<String> {
+		println!("Function get_summary called");
+		return Vec::new();
 	}
 }
-
 
 // *****************************************
 // Private library functions and structures
@@ -137,6 +137,16 @@ mod tests {
 		assert_eq!(h2.score, 0);
 		assert_eq!(a2.name, away_team_name_2);
 		assert_eq!(a2.score, 0);
+	}
+
+	#[test]
+	fn empty_scoreboard_shows_no_results() {
+		let nothing_to_show: Vec<String> = Vec::new();
+
+		let sb = ScoreBoard::new();
+		let result = sb.get_summary();
+
+		assert_eq!(result, nothing_to_show);
 	}
 
 }
