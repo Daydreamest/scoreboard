@@ -16,12 +16,12 @@ impl ScoreBoard {
 		ScoreBoard { data: Vec::new() }
 	}
 
-	pub fn start_match(&mut self, home_name: String, away_name: String) -> Result<(), &'static str> {
+	pub fn start_match(&mut self, home_name: String, away_name: String) -> Result<(), String> {
 		// TODO make sure the name isn't playing a match yet
 		println!("Function start_match called with parameters: '{0}' and '{1}'", home_name, away_name);
 
 		if home_name == away_name {
-			return Err("A team cannot play with itself");
+			return Err(format!("{} cannot play with itself", home_name));
 		}
 
 		let home_team = Team { name: home_name, score: 0 };
@@ -99,11 +99,13 @@ mod tests {
 	fn match_not_started_when_both_teams_have_the_same_name() {
 		let home_team_name = String::from("Georgia");
 		let away_team_name = String::from("Georgia");
+		let expected_error_message = String::from("Georgia cannot play with itself");
 
 		let mut sb = ScoreBoard::new();
 		let result = sb.start_match(home_team_name.clone(), away_team_name.clone());
 
 		assert!(result.is_err());
+		assert!(result.err().is_some_and(|result| result == expected_error_message));
 		assert_eq!(sb.data.len(), 0);
 	}
 }
