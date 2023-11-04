@@ -27,7 +27,7 @@ Develop a new live World Cup scorebard library that shows all the ongoing matche
 
 | Requirement | Status | Comments |
 | ------ | ------ | ------ |
-| 1. Library | <p style="color:red">NO</p> | |
+| 1. Library | <font color="red">NO</font> | |
 | 2. Storage | <p style="color:red">NO</p> | |
 | 3. TDD | <p style="color:red">NO</p> | |
 | 4. API | <p style="color:red">NO</p> | |
