@@ -108,4 +108,33 @@ mod tests {
 		assert!(result.err().is_some_and(|result| result == expected_error_message));
 		assert_eq!(sb.data.len(), 0);
 	}
+
+	#[test]
+	fn two_matches_started_correctly() {
+		let home_team_name_1 = String::from("Nigeria");
+		let away_team_name_1 = String::from("Chad");
+		let home_team_name_2 = String::from("Senegal");
+		let away_team_name_2 = String::from("Algeria");
+
+		let mut sb = ScoreBoard::new();
+		let result_1 = sb.start_match(home_team_name_1.clone(), away_team_name_1.clone());
+		let result_2 = sb.start_match(home_team_name_2.clone(), away_team_name_2.clone());
+
+		assert!(result_1.is_ok());
+		assert!(result_2.is_ok());
+		assert_eq!(sb.data.len(), 2);
+		let m1 = sb.data.get(0).expect("First element is not available.");
+		let Match { home_team: h1, away_team: a1} = m1;
+		assert_eq!(h1.name, home_team_name_1);
+		assert_eq!(h1.score, 0);
+		assert_eq!(a1.name, away_team_name_1);
+		assert_eq!(a1.score, 0);
+		let m2 = sb.data.get(1).expect("Second element is not available.");
+		let Match { home_team: h2, away_team: a2} = m2;
+		assert_eq!(h2.name, home_team_name_2);
+		assert_eq!(h2.score, 0);
+		assert_eq!(a2.name, away_team_name_2);
+		assert_eq!(a2.score, 0);
+	}
+
 }
