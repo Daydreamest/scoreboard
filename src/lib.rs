@@ -46,7 +46,14 @@ impl ScoreBoard {
 
 	pub fn get_summary(&self) -> Vec<String> {
 		println!("Function get_summary called");
-		return Vec::new();
+		
+		let mut result = Vec::new();
+
+		for m in &self.data {
+			result.push(format!("{} {} - {} {}", m.home_team.name, m.home_team.score, m.away_team.name, m.away_team.score));
+		}
+
+		return result;
 	}
 }
 
@@ -147,6 +154,42 @@ mod tests {
 		let result = sb.get_summary();
 
 		assert_eq!(result, nothing_to_show);
+	}
+
+	#[test]
+	fn new_match_shows_up_correctly() {
+		let home_team_name = String::from("India");
+		let away_team_name = String::from("Japan");
+		let expected_summary = String::from("India 0 - Japan 0");
+
+		let mut sb = ScoreBoard::new();
+		sb.start_match(home_team_name.clone(), away_team_name.clone()).expect("Couldn't create the match");
+		let result = sb.get_summary();
+
+		assert_eq!(result.len(), 1);
+		let r = result.get(0).expect("First element is not available.");
+		assert_eq!(r, &expected_summary);
+	}
+
+	#[test]
+	fn two_matches_show_correctly() {
+		let home_team_name_1 = String::from("Uruguay");
+		let away_team_name_1 = String::from("Columbia");
+		let home_team_name_2 = String::from("Peru");
+		let away_team_name_2 = String::from("Chile");
+		let expected_summary_1 = String::from("Uruguay 0 - Columbia 0");
+		let expected_summary_2 = String::from("Peru 0 - Chile 0");
+
+		let mut sb = ScoreBoard::new();
+		sb.start_match(home_team_name_1.clone(), away_team_name_1.clone()).expect("Couldn't create the first match");
+		sb.start_match(home_team_name_2.clone(), away_team_name_2.clone()).expect("Couldn't create the second match");
+		let result = sb.get_summary();
+
+		assert_eq!(result.len(), 2);
+		let r_1 = result.get(0).expect("First element is not available.");
+		let r_2 = result.get(1).expect("First element is not available.");
+		assert_eq!(r_1, &expected_summary_1);
+		assert_eq!(r_2, &expected_summary_2);
 	}
 
 }
