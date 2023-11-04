@@ -31,14 +31,14 @@ impl ScoreBoard {
 		Ok(())
 	}
 
-	pub fn update_score(text: String) -> i32 {
+	pub fn update_score(text: String) -> Result<(), String> {
 		println!("Function update_score called with parameter '{}'", text);
-		return 0;
+		Ok(())
 	}
 
-	pub fn finish_match(text: String) -> i32 {
+	pub fn finish_match(text: String) -> Result<(), String> {
 		println!("Function finish_match called with parameter '{}'", text);
-		return 0;
+		Ok(())
 	}
 
 	pub fn get_summary(text: String) -> i32 {
