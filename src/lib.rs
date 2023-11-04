@@ -17,9 +17,13 @@ impl ScoreBoard {
 	}
 
 	pub fn start_match(&mut self, home_name: String, away_name: String) -> Result<(), &'static str> {
-		// TODO make sure names are different
 		// TODO make sure the name isn't playing a match yet
 		println!("Function start_match called with parameters: '{0}' and '{1}'", home_name, away_name);
+
+		if home_name == away_name {
+			return Err("A team cannot play with itself");
+		}
+
 		let home_team = Team { name: home_name, score: 0 };
 		let away_team = Team { name: away_name, score: 0 };
 		let new_match = Match { home_team, away_team };
@@ -74,7 +78,7 @@ mod tests {
 	}
 
 	#[test]
-	fn match_started() {
+	fn match_started_correctly() {
 		let home_team_name = String::from("Monaco");
 		let away_team_name = String::from("Switzerland");
 
@@ -91,4 +95,15 @@ mod tests {
 		assert_eq!(a.score, 0);
 	}
 
+	#[test]
+	fn match_not_started_when_both_teams_have_the_same_name() {
+		let home_team_name = String::from("Georgia");
+		let away_team_name = String::from("Georgia");
+
+		let mut sb = ScoreBoard::new();
+		let result = sb.start_match(home_team_name.clone(), away_team_name.clone());
+
+		assert!(result.is_err());
+		assert_eq!(sb.data.len(), 0);
+	}
 }
