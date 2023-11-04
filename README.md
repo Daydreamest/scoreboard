@@ -27,14 +27,14 @@ Develop a new live World Cup scorebard library that shows all the ongoing matche
 
 | Requirement | Status | Comments |
 | ------ | ------ | ------ |
-| 1. Library | <font color="red">NO</font> | |
-| 2. Storage | <p style="color:red">NO</p> | |
-| 3. TDD | <p style="color:red">NO</p> | |
-| 4. API | <p style="color:red">NO</p> | |
-| 4.1. Start | <p style="color:red">NO</p> | |
-| 4.2. Update | <p style="color:red">NO</p> | |
-| 4.3. Finish | <p style="color:red">NO</p> | |
-| 4.4. Summary | <p style="color:red">NO</p> | |
+| 1. Library | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | |
+| 2. Storage | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | |
+| 3. TDD | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | |
+| 4. API | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | |
+| 4.1. Start | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | |
+| 4.2. Update | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | |
+| 4.3. Finish | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | |
+| 4.4. Summary | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | |
 
 ### Extra features
 
