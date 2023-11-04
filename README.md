@@ -43,6 +43,32 @@ Develop a new live World Cup scorebard library that shows all the ongoing matche
 | Team uniqueness | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | |
 | Thread safety | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | |
 
+## Instannation and usage
+
+### Installation
+
+1. Install Rust work environment. Use the standard [Rust installation guide](https://www.rust-lang.org/learn/get-started) with all the default options
+2. This should also install [Cargo](https://doc.rust-lang.org/cargo/), Rust default package manager
+3. Clone this repository
+
+### Compilation
+
+Move to the "scoreboard" directory and run:
+
+`> cargo build`
+
+On the first execution Cargo may download dependencies and libraries. After that, the library will be compiled to a biniary:
+
+`scoreboard/target/debug/libscoreboard.rlib`
+
+### Usage
+
+### Testing
+
+To run tests move to the "scoreboard" directory and run:
+
+`> cargo test`
+
 ## Possible additional features
 
 ### API
