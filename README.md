@@ -19,7 +19,7 @@ Develop a new live World Cup scorebard library that shows all the ongoing matche
 
 1. No specific programming language is expected. For learning purposes, this project will use [Rust](https://www.rust-lang.org/)
 2. There is no mention of thread safety. It's assumed to be a "nice to have" feature
-3. A team can be playing a single match only at a given time. For example, if there is a currently ongoing match between Honduras and Costarica, neither of those two teams can be present in a newly created match.
+3. A team can be playing a single match only at a given time. For example, if there is a currently ongoing match between Honduras and Costarica, neither of those two teams can be present in a newly created match
 
 ## Progress
 
@@ -40,4 +40,12 @@ Develop a new live World Cup scorebard library that shows all the ongoing matche
 
 | Features | Status | Comments |
 | ------ | ------ | ------ |
-| Thread safety| | |
+| Team uniqueness | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | |
+| Thread safety | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | |
+
+## Possible additional features
+
+### API
+
+### Optimization
+
