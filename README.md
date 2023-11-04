@@ -44,7 +44,7 @@ Develop a new live World Cup scorebard library that shows all the ongoing matche
 | Team uniqueness | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | |
 | Thread safety | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | |
 
-## Instannation and usage
+## Installation and usage
 
 ### Installation
 
