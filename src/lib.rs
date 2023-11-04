@@ -24,10 +24,12 @@ impl ScoreBoard {
 			return Err(format!("{} cannot play with itself", home_name));
 		}
 
-		let home_team = Team { name: home_name, score: 0 };
-		let away_team = Team { name: away_name, score: 0 };
-		let new_match = Match { home_team, away_team };
-		self.data.push(new_match);
+		self.data.push(
+			Match {
+				home_team : Team { name: home_name, score: 0 },
+				away_team : Team { name: away_name, score: 0 }
+			}
+		);
 		Ok(())
 	}
 
