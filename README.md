@@ -12,7 +12,7 @@ Develop a new live World Cup scorebard library that shows all the ongoing matche
 4. Implement basic API:
 	- Start a match. Assuming initial score "0-0", should capture two parameters: home team and away team
 	- Update score. Should receive a pair of absolute scores: home team score and away team score
-	- Fisnish match. Remove a match currently in progress from the scoreboard
+	- Finish match. Remove a match currently in progress from the scoreboard
 	- Get a summary. Returns all the current matches ordered by total score, even total scores are ordered by most recent start
 
 ## Assumptions
@@ -20,6 +20,7 @@ Develop a new live World Cup scorebard library that shows all the ongoing matche
 1. No specific programming language is expected. For learning purposes, this project will use [Rust](https://www.rust-lang.org/)
 2. There is no mention of thread safety. It's assumed to be a "nice to have" feature
 3. A team can be playing a single match only at a given time. For example, if there is a currently ongoing match between Honduras and Costarica, neither of those two teams can be present in a newly created match
+4. Getting a summary of the current results will be much more frequently used than all the other API functions combined. This will impact optimization choices
 
 ## Progress
 
@@ -55,11 +56,11 @@ Develop a new live World Cup scorebard library that shows all the ongoing matche
 
 Move to the "scoreboard" directory and run:
 
-`> cargo build`
+`> cargo build --release`
 
 On the first execution Cargo may download dependencies and libraries. After that, the library will be compiled to a biniary:
 
-`scoreboard/target/debug/libscoreboard.rlib`
+`scoreboard/target/release/libscoreboard.rlib`
 
 ### Usage
 
