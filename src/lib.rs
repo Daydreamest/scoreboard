@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+use std::fmt;
 use std::string::String;
 use std::vec::Vec;
 
@@ -49,8 +50,8 @@ impl ScoreBoard {
 		
 		let mut result = Vec::new();
 
-		for m in &self.data {
-			result.push(format!("{} {} - {} {}", m.home_team.name, m.home_team.score, m.away_team.name, m.away_team.score));
+		for game in &self.data {
+			result.push(game.to_string());
 		}
 
 		return result;
@@ -66,9 +67,21 @@ struct Team {
 	score: u8,
 }
 
+impl fmt::Display for Team {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} {}", self.name, self.score)
+    }
+}
+
 struct Game {
 	home_team: Team,
 	away_team: Team,
+}
+
+impl fmt::Display for Game {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} - {}", self.home_team.to_string(), self.away_team.to_string())
+    }
 }
 
 // ***********
