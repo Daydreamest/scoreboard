@@ -108,7 +108,7 @@ mod tests {
 	fn scoreboard_is_empty_at_start() {
 		let sb = ScoreBoard::new();
 
-		assert_eq!(sb.data.len(), 0);
+		assert!(sb.data.is_empty());
 	}
 
 	#[test]
@@ -121,8 +121,7 @@ mod tests {
 
 		assert!(result.is_ok());
 		assert_eq!(sb.data.len(), 1);
-		let game = sb.data.first().expect("First element is not available.");
-		let Game { home_team: h, away_team: a} = game;
+		let Game { home_team: h, away_team: a} = sb.data.first().expect("First element is not available.");
 		assert_eq!(h.name, home_team_name);
 		assert_eq!(h.score, 0);
 		assert_eq!(a.name, away_team_name);
@@ -140,7 +139,7 @@ mod tests {
 
 		assert!(result.is_err());
 		assert!(result.err().is_some_and(|result| result == expected_error_message));
-		assert_eq!(sb.data.len(), 0);
+		assert!(sb.data.is_empty());
 	}
 
 	#[test]
@@ -157,18 +156,16 @@ mod tests {
 		assert!(result_1.is_ok());
 		assert!(result_2.is_ok());
 		assert_eq!(sb.data.len(), 2);
-		let game_1 = sb.data.get(0).expect("First element is not available.");
-		let Game { home_team: h1, away_team: a1} = game_1;
-		assert_eq!(h1.name, home_team_name_1);
-		assert_eq!(h1.score, 0);
-		assert_eq!(a1.name, away_team_name_1);
-		assert_eq!(a1.score, 0);
-		let game_2 = sb.data.get(1).expect("Second element is not available.");
-		let Game { home_team: h2, away_team: a2} = game_2;
-		assert_eq!(h2.name, home_team_name_2);
-		assert_eq!(h2.score, 0);
-		assert_eq!(a2.name, away_team_name_2);
-		assert_eq!(a2.score, 0);
+		let Game { home_team: h_1, away_team: a_1} = sb.data.get(0).expect("First element is not available.");
+		assert_eq!(h_1.name, home_team_name_1);
+		assert_eq!(h_1.score, 0);
+		assert_eq!(a_1.name, away_team_name_1);
+		assert_eq!(a_1.score, 0);
+		let Game { home_team: h_2, away_team: a_2} = sb.data.get(1).expect("Second element is not available.");
+		assert_eq!(h_2.name, home_team_name_2);
+		assert_eq!(h_2.score, 0);
+		assert_eq!(a_2.name, away_team_name_2);
+		assert_eq!(a_2.score, 0);
 	}
 
 	#[test]
