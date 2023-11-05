@@ -8,7 +8,7 @@ use std::vec::Vec;
 // *********************
 
 pub struct ScoreBoard {
-	data: Vec<Match>
+	data: Vec<Game>
 }
 
 impl ScoreBoard {
@@ -16,16 +16,16 @@ impl ScoreBoard {
 		ScoreBoard { data: Vec::new() }
 	}
 
-	pub fn start_match(&mut self, home_name: String, away_name: String) -> Result<(), String> {
-		// TODO make sure the name isn't playing a match yet
-		println!("Function start_match called with parameters: '{0}' and '{1}'", home_name, away_name);
+	pub fn start_game(&mut self, home_name: String, away_name: String) -> Result<(), String> {
+		// TODO make sure the name isn't playing a game yet
+		println!("Function start_game called with parameters: '{0}' and '{1}'", home_name, away_name);
 
 		if home_name == away_name {
 			return Err(format!("{} cannot play with itself", home_name));
 		}
 
 		self.data.push(
-			Match {
+			Game {
 				home_team : Team { name: home_name, score: 0 },
 				away_team : Team { name: away_name, score: 0 }
 			}
@@ -39,8 +39,8 @@ impl ScoreBoard {
 		Ok(())
 	}
 
-	pub fn finish_match(text: String) -> Result<(), String> {
-		println!("Function finish_match called with parameter '{}'", text);
+	pub fn finish_game(text: String) -> Result<(), String> {
+		println!("Function finish_game called with parameter '{}'", text);
 		Ok(())
 	}
 
@@ -66,7 +66,7 @@ struct Team {
 	score: u8,
 }
 
-struct Match {
+struct Game {
 	home_team: Team,
 	away_team: Team,
 }
@@ -87,17 +87,17 @@ mod tests {
 	}
 
 	#[test]
-	fn match_started_correctly() {
+	fn game_started_correctly() {
 		let home_team_name = String::from("Monaco");
 		let away_team_name = String::from("Switzerland");
 
 		let mut sb = ScoreBoard::new();
-		let result = sb.start_match(home_team_name.clone(), away_team_name.clone());
+		let result = sb.start_game(home_team_name.clone(), away_team_name.clone());
 
 		assert!(result.is_ok());
 		assert_eq!(sb.data.len(), 1);
-		let m = sb.data.first().expect("First element is not available.");
-		let Match { home_team: h, away_team: a} = m;
+		let game = sb.data.first().expect("First element is not available.");
+		let Game { home_team: h, away_team: a} = game;
 		assert_eq!(h.name, home_team_name);
 		assert_eq!(h.score, 0);
 		assert_eq!(a.name, away_team_name);
@@ -105,13 +105,13 @@ mod tests {
 	}
 
 	#[test]
-	fn match_not_started_when_both_teams_have_the_same_name() {
+	fn game_not_started_when_both_teams_have_the_same_name() {
 		let home_team_name = String::from("Georgia");
 		let away_team_name = String::from("Georgia");
 		let expected_error_message = String::from("Georgia cannot play with itself");
 
 		let mut sb = ScoreBoard::new();
-		let result = sb.start_match(home_team_name.clone(), away_team_name.clone());
+		let result = sb.start_game(home_team_name.clone(), away_team_name.clone());
 
 		assert!(result.is_err());
 		assert!(result.err().is_some_and(|result| result == expected_error_message));
@@ -119,27 +119,27 @@ mod tests {
 	}
 
 	#[test]
-	fn two_matches_started_correctly() {
+	fn two_games_started_correctly() {
 		let home_team_name_1 = String::from("Nigeria");
 		let away_team_name_1 = String::from("Chad");
 		let home_team_name_2 = String::from("Senegal");
 		let away_team_name_2 = String::from("Algeria");
 
 		let mut sb = ScoreBoard::new();
-		let result_1 = sb.start_match(home_team_name_1.clone(), away_team_name_1.clone());
-		let result_2 = sb.start_match(home_team_name_2.clone(), away_team_name_2.clone());
+		let result_1 = sb.start_game(home_team_name_1.clone(), away_team_name_1.clone());
+		let result_2 = sb.start_game(home_team_name_2.clone(), away_team_name_2.clone());
 
 		assert!(result_1.is_ok());
 		assert!(result_2.is_ok());
 		assert_eq!(sb.data.len(), 2);
-		let m1 = sb.data.get(0).expect("First element is not available.");
-		let Match { home_team: h1, away_team: a1} = m1;
+		let game_1 = sb.data.get(0).expect("First element is not available.");
+		let Game { home_team: h1, away_team: a1} = game_1;
 		assert_eq!(h1.name, home_team_name_1);
 		assert_eq!(h1.score, 0);
 		assert_eq!(a1.name, away_team_name_1);
 		assert_eq!(a1.score, 0);
-		let m2 = sb.data.get(1).expect("Second element is not available.");
-		let Match { home_team: h2, away_team: a2} = m2;
+		let game_2 = sb.data.get(1).expect("Second element is not available.");
+		let Game { home_team: h2, away_team: a2} = game_2;
 		assert_eq!(h2.name, home_team_name_2);
 		assert_eq!(h2.score, 0);
 		assert_eq!(a2.name, away_team_name_2);
@@ -157,13 +157,13 @@ mod tests {
 	}
 
 	#[test]
-	fn new_match_shows_up_correctly() {
+	fn new_game_shows_up_correctly() {
 		let home_team_name = String::from("India");
 		let away_team_name = String::from("Japan");
 		let expected_summary = String::from("India 0 - Japan 0");
 
 		let mut sb = ScoreBoard::new();
-		sb.start_match(home_team_name.clone(), away_team_name.clone()).expect("Couldn't create the match");
+		sb.start_game(home_team_name.clone(), away_team_name.clone()).expect("Couldn't create the game");
 		let result = sb.get_summary();
 
 		assert_eq!(result.len(), 1);
@@ -172,7 +172,7 @@ mod tests {
 	}
 
 	#[test]
-	fn two_matches_show_correctly() {
+	fn two_games_show_correctly() {
 		let home_team_name_1 = String::from("Uruguay");
 		let away_team_name_1 = String::from("Columbia");
 		let home_team_name_2 = String::from("Peru");
@@ -181,13 +181,13 @@ mod tests {
 		let expected_summary_2 = String::from("Peru 0 - Chile 0");
 
 		let mut sb = ScoreBoard::new();
-		sb.start_match(home_team_name_1.clone(), away_team_name_1.clone()).expect("Couldn't create the first match");
-		sb.start_match(home_team_name_2.clone(), away_team_name_2.clone()).expect("Couldn't create the second match");
+		sb.start_game(home_team_name_1.clone(), away_team_name_1.clone()).expect("Couldn't create the first game");
+		sb.start_game(home_team_name_2.clone(), away_team_name_2.clone()).expect("Couldn't create the second game");
 		let result = sb.get_summary();
 
 		assert_eq!(result.len(), 2);
 		let r_1 = result.get(0).expect("First element is not available.");
-		let r_2 = result.get(1).expect("First element is not available.");
+		let r_2 = result.get(1).expect("Second element is not available.");
 		assert_eq!(r_1, &expected_summary_1);
 		assert_eq!(r_2, &expected_summary_2);
 	}

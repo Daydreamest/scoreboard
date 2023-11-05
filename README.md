@@ -58,7 +58,7 @@ Move to the "scoreboard" directory and run:
 
 `> cargo build --release`
 
-On the first execution Cargo may download dependencies and libraries. After that, the library will be compiled to a biniary:
+On the first execution Cargo may download dependencies and libraries. After that, the library will be compiled to a binary:
 
 `scoreboard/target/release/libscoreboard.rlib`
 
@@ -90,3 +90,6 @@ To run tests move to the "scoreboard" directory and run:
 
 ### Optimization
 
+## Issues
+
+1. "match" is a keyword in Rust, so thw word "game" is used throughout the code in the meaning of "a match between two teams"
