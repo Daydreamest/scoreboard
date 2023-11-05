@@ -105,7 +105,7 @@ impl ScoreBoard {
 			}
 		}
 
-		Err(String::from("No such game found"))
+		Err(String::from("Couldn't find a game for removal"))
 	}
 }
 
@@ -129,6 +129,7 @@ mod tests {
 	const SCORELESS_GAME_2: &str = "Senegal 0 - Algeria 0";
 
 	const NOTHING_TO_SHOW: Vec<String> = Vec::new();
+	const REMOVAL_ERROR_MESSAGE: &str = "Couldn't find a game for removal";
 
 	#[test]
 	fn scoreboard_is_empty_at_start() {
@@ -139,7 +140,6 @@ mod tests {
 
 	#[test]
 	fn game_started_correctly() {
-
 		let mut sb = ScoreBoard::new();
 		let result = sb.start_game_with_literal_names(HOME_TEAM_NAME, AWAY_TEAM_NAME);
 
@@ -154,7 +154,7 @@ mod tests {
 
 	#[test]
 	fn game_not_started_when_both_teams_have_the_same_name() {
-		let expected_error_message = "Monaco cannot play with itself";
+		let expected_error_message = format!("{} cannot play with itself", HOME_TEAM_NAME);
 
 		let mut sb = ScoreBoard::new();
 		let result = sb.start_game_with_literal_names(HOME_TEAM_NAME, HOME_TEAM_NAME);
@@ -166,7 +166,6 @@ mod tests {
 
 	#[test]
 	fn two_games_started_correctly() {
-
 		let mut sb = ScoreBoard::new();
 		let result_1 = sb.start_game_with_literal_names(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1);
 		let result_2 = sb.start_game_with_literal_names(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2);
@@ -188,7 +187,6 @@ mod tests {
 
 	#[test]
 	fn empty_scoreboard_shows_no_results() {
-
 		let sb = ScoreBoard::new();
 		let result = sb.get_summary();
 
@@ -197,7 +195,6 @@ mod tests {
 
 	#[test]
 	fn new_game_shows_up_correctly() {
-
 		let mut sb = ScoreBoard::new();
 		sb.start_game_with_literal_names(HOME_TEAM_NAME, AWAY_TEAM_NAME).expect("Couldn't create the game");
 		let result = sb.get_summary();
@@ -209,7 +206,6 @@ mod tests {
 
 	#[test]
 	fn two_games_show_correctly() {
-
 		let mut sb = ScoreBoard::new();
 		sb.start_game_with_literal_names(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
 		sb.start_game_with_literal_names(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2).expect("Couldn't create the second game");
@@ -224,7 +220,6 @@ mod tests {
 
 	#[test]
 	fn removing_a_single_game_leaves_the_score_board_empty() {
-
 		let mut sb = ScoreBoard::new();
 		sb.start_game_with_literal_names(HOME_TEAM_NAME, AWAY_TEAM_NAME).expect("Couldn't create the game");
 		let result_1 = sb.finish_game_with_literal_names(HOME_TEAM_NAME, AWAY_TEAM_NAME);
@@ -252,53 +247,40 @@ mod tests {
 
 	#[test]
 	fn removal_on_empty_board_returns_an_error() {
-		let home_team_name = "Jamaica";
-		let away_team_name = "Nicaragua";
-		let expected_error_message = "No such game found";
-		let nothing_to_show: Vec<String> = Vec::new();
-
 		let mut sb = ScoreBoard::new();
 		let result_1 = sb.finish_game_with_literal_names(HOME_TEAM_NAME, AWAY_TEAM_NAME);
 		let result_2 = sb.get_summary();
 
 		assert!(sb.data.is_empty());
-		assert!(result_1.err().is_some_and(|result| result == expected_error_message));
+		assert!(result_1.err().is_some_and(|result| result == REMOVAL_ERROR_MESSAGE));
 		assert_eq!(result_2, NOTHING_TO_SHOW);
 	}
 
 	#[test]
 	fn mismatched_home_and_away_names_in_removal_return_error() {
-		let home_team_name = "Quatar";
-		let away_team_name = "Tajikistan";
-		let expected_error_message = "No such game found";
-		let expected_summary = vec![String::from("Quatar 0 - Tajikistan 0")];
+		let expected_summary = vec![SCORELESS_GAME];
 
 		let mut sb = ScoreBoard::new();
-		sb.start_game_with_literal_names(home_team_name, away_team_name).expect("Couldn't create the game");
-		let result_1 = sb.finish_game_with_literal_names(away_team_name, home_team_name);
+		sb.start_game_with_literal_names(HOME_TEAM_NAME, AWAY_TEAM_NAME).expect("Couldn't create the game");
+		let result_1 = sb.finish_game_with_literal_names(AWAY_TEAM_NAME, HOME_TEAM_NAME);
 		let result_2 = sb.get_summary();
 
 		assert_eq!(sb.data.len(), 1);
-		assert!(result_1.err().is_some_and(|result| result == expected_error_message));
+		assert!(result_1.err().is_some_and(|result| result == REMOVAL_ERROR_MESSAGE));
 		assert_eq!(result_2, expected_summary);
 	}
 
 	#[test]
 	fn removal_of_wrong_team_returns_an_error() {
-		let home_team_name_1 = "Venezuela";
-		let away_team_name_1 = "Suriname";
-		let home_team_name_2 = "Cambodja";
-		let away_team_name_2 = "Vietnam";
-		let expected_error_message = "No such game found";
-		let expected_summary = vec![String::from("Venezuela 0 - Suriname 0")];
+		let expected_summary = vec![SCORELESS_GAME_1];
 
 		let mut sb = ScoreBoard::new();
-		sb.start_game_with_literal_names(home_team_name_1, away_team_name_1).expect("Couldn't create the game");
-		let result_1 = sb.finish_game_with_literal_names(away_team_name_2, home_team_name_2);
+		sb.start_game_with_literal_names(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the game");
+		let result_1 = sb.finish_game_with_literal_names(AWAY_TEAM_NAME_2, HOME_TEAM_NAME_2);
 		let result_2 = sb.get_summary();
 
 		assert_eq!(sb.data.len(), 1);
-		assert!(result_1.err().is_some_and(|result| result == expected_error_message));
+		assert!(result_1.err().is_some_and(|result| result == REMOVAL_ERROR_MESSAGE));
 		assert_eq!(result_2, expected_summary);
 	}
 }
