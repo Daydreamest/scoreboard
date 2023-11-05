@@ -117,6 +117,19 @@ impl ScoreBoard {
 mod tests {
     use super::*;
 
+	const HOME_TEAM_NAME: &str = "Monaco";
+	const AWAY_TEAM_NAME: &str = "Switzerland";
+	const SCORELESS_GAME: &str = "Monaco 0 - Switzerland 0";
+
+	const HOME_TEAM_NAME_1: &str = "Nigeria";
+	const AWAY_TEAM_NAME_1: &str = "Chad";
+	const SCORELESS_GAME_1: &str = "Nigeria 0 - Chad 0";
+	const HOME_TEAM_NAME_2: &str = "Senegal";
+	const AWAY_TEAM_NAME_2: &str = "Algeria";
+	const SCORELESS_GAME_2: &str = "Senegal 0 - Algeria 0";
+
+	const NOTHING_TO_SHOW: Vec<String> = Vec::new();
+
 	#[test]
 	fn scoreboard_is_empty_at_start() {
 		let sb = ScoreBoard::new();
@@ -126,29 +139,25 @@ mod tests {
 
 	#[test]
 	fn game_started_correctly() {
-		let home_team_name = "Monaco";
-		let away_team_name = "Switzerland";
 
 		let mut sb = ScoreBoard::new();
-		let result = sb.start_game_with_literal_names(home_team_name, away_team_name);
+		let result = sb.start_game_with_literal_names(HOME_TEAM_NAME, AWAY_TEAM_NAME);
 
 		assert!(result.is_ok());
 		assert_eq!(sb.data.len(), 1);
 		let Game { home_team: h, away_team: a} = sb.data.first().expect("First element is not available.");
-		assert_eq!(h.name, home_team_name);
+		assert_eq!(h.name, HOME_TEAM_NAME);
 		assert_eq!(h.score, 0);
-		assert_eq!(a.name, away_team_name);
+		assert_eq!(a.name, AWAY_TEAM_NAME);
 		assert_eq!(a.score, 0);
 	}
 
 	#[test]
 	fn game_not_started_when_both_teams_have_the_same_name() {
-		let home_team_name = "Georgia";
-		let away_team_name = "Georgia";
-		let expected_error_message = "Georgia cannot play with itself";
+		let expected_error_message = "Monaco cannot play with itself";
 
 		let mut sb = ScoreBoard::new();
-		let result = sb.start_game_with_literal_names(home_team_name, away_team_name);
+		let result = sb.start_game_with_literal_names(HOME_TEAM_NAME, HOME_TEAM_NAME);
 
 		assert!(result.is_err());
 		assert!(result.err().is_some_and(|result| result == expected_error_message));
@@ -157,104 +166,83 @@ mod tests {
 
 	#[test]
 	fn two_games_started_correctly() {
-		let home_team_name_1 = "Nigeria";
-		let away_team_name_1 = "Chad";
-		let home_team_name_2 = "Senegal";
-		let away_team_name_2 = "Algeria";
 
 		let mut sb = ScoreBoard::new();
-		let result_1 = sb.start_game_with_literal_names(home_team_name_1, away_team_name_1);
-		let result_2 = sb.start_game_with_literal_names(home_team_name_2, away_team_name_2);
+		let result_1 = sb.start_game_with_literal_names(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1);
+		let result_2 = sb.start_game_with_literal_names(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2);
 
 		assert!(result_1.is_ok());
 		assert!(result_2.is_ok());
 		assert_eq!(sb.data.len(), 2);
 		let Game { home_team: h_1, away_team: a_1} = sb.data.get(0).expect("First element is not available.");
-		assert_eq!(h_1.name, home_team_name_1);
+		assert_eq!(h_1.name, HOME_TEAM_NAME_1);
 		assert_eq!(h_1.score, 0);
-		assert_eq!(a_1.name, away_team_name_1);
+		assert_eq!(a_1.name, AWAY_TEAM_NAME_1);
 		assert_eq!(a_1.score, 0);
 		let Game { home_team: h_2, away_team: a_2} = sb.data.get(1).expect("Second element is not available.");
-		assert_eq!(h_2.name, home_team_name_2);
+		assert_eq!(h_2.name, HOME_TEAM_NAME_2);
 		assert_eq!(h_2.score, 0);
-		assert_eq!(a_2.name, away_team_name_2);
+		assert_eq!(a_2.name, AWAY_TEAM_NAME_2);
 		assert_eq!(a_2.score, 0);
 	}
 
 	#[test]
 	fn empty_scoreboard_shows_no_results() {
-		let nothing_to_show: Vec<String> = Vec::new();
 
 		let sb = ScoreBoard::new();
 		let result = sb.get_summary();
 
-		assert_eq!(result, nothing_to_show);
+		assert_eq!(result, NOTHING_TO_SHOW);
 	}
 
 	#[test]
 	fn new_game_shows_up_correctly() {
-		let home_team_name = "India";
-		let away_team_name = "Japan";
-		let expected_summary = "India 0 - Japan 0";
 
 		let mut sb = ScoreBoard::new();
-		sb.start_game_with_literal_names(home_team_name, away_team_name).expect("Couldn't create the game");
+		sb.start_game_with_literal_names(HOME_TEAM_NAME, AWAY_TEAM_NAME).expect("Couldn't create the game");
 		let result = sb.get_summary();
 
 		assert_eq!(result.len(), 1);
 		let r = result.get(0).expect("First element is not available.");
-		assert_eq!(r, &expected_summary);
+		assert_eq!(r, SCORELESS_GAME);
 	}
 
 	#[test]
 	fn two_games_show_correctly() {
-		let home_team_name_1 = "Uruguay";
-		let away_team_name_1 = "Columbia";
-		let home_team_name_2 = "Peru";
-		let away_team_name_2 = "Chile";
-		let expected_summary_1 = "Uruguay 0 - Columbia 0";
-		let expected_summary_2 = "Peru 0 - Chile 0";
 
 		let mut sb = ScoreBoard::new();
-		sb.start_game_with_literal_names(home_team_name_1, away_team_name_1).expect("Couldn't create the first game");
-		sb.start_game_with_literal_names(home_team_name_2, away_team_name_2).expect("Couldn't create the second game");
+		sb.start_game_with_literal_names(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
+		sb.start_game_with_literal_names(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2).expect("Couldn't create the second game");
 		let result = sb.get_summary();
 
 		assert_eq!(result.len(), 2);
 		let r_1 = result.get(0).expect("First element is not available.");
 		let r_2 = result.get(1).expect("Second element is not available.");
-		assert_eq!(r_1, &expected_summary_1);
-		assert_eq!(r_2, &expected_summary_2);
+		assert_eq!(r_1, SCORELESS_GAME_1);
+		assert_eq!(r_2, SCORELESS_GAME_2);
 	}
 
 	#[test]
 	fn removing_a_single_game_leaves_the_score_board_empty() {
-		let home_team_name = "New Zeland";
-		let away_team_name = "Philippines";
-		let nothing_to_show: Vec<String> = Vec::new();
 
 		let mut sb = ScoreBoard::new();
-		sb.start_game_with_literal_names(home_team_name, away_team_name).expect("Couldn't create the game");
-		let result_1 = sb.finish_game_with_literal_names(home_team_name, away_team_name);
+		sb.start_game_with_literal_names(HOME_TEAM_NAME, AWAY_TEAM_NAME).expect("Couldn't create the game");
+		let result_1 = sb.finish_game_with_literal_names(HOME_TEAM_NAME, AWAY_TEAM_NAME);
 		let result_2 = sb.get_summary();
 
 		assert!(sb.data.is_empty());
 		assert!(result_1.is_ok());
-		assert_eq!(result_2, nothing_to_show);
+		assert_eq!(result_2, NOTHING_TO_SHOW);
 	}
 
 	#[test]
 	fn adding_after_removal_works() {
-		let home_team_name_1 = "Austria";
-		let away_team_name_1 = "Belarus";
-		let home_team_name_2 = "Cyprus";
-		let away_team_name_2 = "Latvia";
-		let expected_summary = vec![String::from("Cyprus 0 - Latvia 0")];
+		let expected_summary = vec![SCORELESS_GAME_2];
 
 		let mut sb = ScoreBoard::new();
-		sb.start_game_with_literal_names(home_team_name_1, away_team_name_1).expect("Couldn't create the first game");
-		sb.finish_game_with_literal_names(home_team_name_1, away_team_name_1).expect("Couldn't finish the first game");
-		let result_1 = sb.start_game_with_literal_names(home_team_name_2, away_team_name_2);
+		sb.start_game_with_literal_names(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
+		sb.finish_game_with_literal_names(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't finish the first game");
+		let result_1 = sb.start_game_with_literal_names(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2);
 		let result_2 = sb.get_summary();
 
 		assert_eq!(sb.data.len(), 1);
@@ -270,12 +258,12 @@ mod tests {
 		let nothing_to_show: Vec<String> = Vec::new();
 
 		let mut sb = ScoreBoard::new();
-		let result_1 = sb.finish_game_with_literal_names(home_team_name, away_team_name);
+		let result_1 = sb.finish_game_with_literal_names(HOME_TEAM_NAME, AWAY_TEAM_NAME);
 		let result_2 = sb.get_summary();
 
 		assert!(sb.data.is_empty());
 		assert!(result_1.err().is_some_and(|result| result == expected_error_message));
-		assert_eq!(result_2, nothing_to_show);
+		assert_eq!(result_2, NOTHING_TO_SHOW);
 	}
 
 	#[test]
