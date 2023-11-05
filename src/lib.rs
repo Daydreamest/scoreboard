@@ -86,6 +86,16 @@ impl fmt::Display for Game {
     }
 }
 
+impl ScoreBoard {
+	pub fn start_game_with_literal_names(&mut self, home_name: &str, away_name: &str) -> Result<(), String> {
+		self.start_game(String::from(home_name), String::from(away_name))
+	}
+
+	pub fn finish_game_with_literal_names(&mut self, home_name: &str, away_name: &str) -> Result<(), String> {
+		self.finish_game(String::from(home_name), String::from(away_name))
+	}
+}
+
 // ***********
 // Unit tests
 // ***********
@@ -98,21 +108,20 @@ mod tests {
 	fn scoreboard_is_empty_at_start() {
 		let sb = ScoreBoard::new();
 
-		assert_eq!(sb.data.len(), 0);
+		assert!(sb.data.is_empty());
 	}
 
 	#[test]
 	fn game_started_correctly() {
-		let home_team_name = String::from("Monaco");
-		let away_team_name = String::from("Switzerland");
+		let home_team_name = "Monaco";
+		let away_team_name = "Switzerland";
 
 		let mut sb = ScoreBoard::new();
-		let result = sb.start_game(home_team_name.clone(), away_team_name.clone());
+		let result = sb.start_game_with_literal_names(home_team_name, away_team_name);
 
 		assert!(result.is_ok());
 		assert_eq!(sb.data.len(), 1);
-		let game = sb.data.first().expect("First element is not available.");
-		let Game { home_team: h, away_team: a} = game;
+		let Game { home_team: h, away_team: a} = sb.data.first().expect("First element is not available.");
 		assert_eq!(h.name, home_team_name);
 		assert_eq!(h.score, 0);
 		assert_eq!(a.name, away_team_name);
@@ -121,44 +130,42 @@ mod tests {
 
 	#[test]
 	fn game_not_started_when_both_teams_have_the_same_name() {
-		let home_team_name = String::from("Georgia");
-		let away_team_name = String::from("Georgia");
-		let expected_error_message = String::from("Georgia cannot play with itself");
+		let home_team_name = "Georgia";
+		let away_team_name = "Georgia";
+		let expected_error_message = "Georgia cannot play with itself";
 
 		let mut sb = ScoreBoard::new();
-		let result = sb.start_game(home_team_name.clone(), away_team_name.clone());
+		let result = sb.start_game_with_literal_names(home_team_name, away_team_name);
 
 		assert!(result.is_err());
 		assert!(result.err().is_some_and(|result| result == expected_error_message));
-		assert_eq!(sb.data.len(), 0);
+		assert!(sb.data.is_empty());
 	}
 
 	#[test]
 	fn two_games_started_correctly() {
-		let home_team_name_1 = String::from("Nigeria");
-		let away_team_name_1 = String::from("Chad");
-		let home_team_name_2 = String::from("Senegal");
-		let away_team_name_2 = String::from("Algeria");
+		let home_team_name_1 = "Nigeria";
+		let away_team_name_1 = "Chad";
+		let home_team_name_2 = "Senegal";
+		let away_team_name_2 = "Algeria";
 
 		let mut sb = ScoreBoard::new();
-		let result_1 = sb.start_game(home_team_name_1.clone(), away_team_name_1.clone());
-		let result_2 = sb.start_game(home_team_name_2.clone(), away_team_name_2.clone());
+		let result_1 = sb.start_game_with_literal_names(home_team_name_1, away_team_name_1);
+		let result_2 = sb.start_game_with_literal_names(home_team_name_2, away_team_name_2);
 
 		assert!(result_1.is_ok());
 		assert!(result_2.is_ok());
 		assert_eq!(sb.data.len(), 2);
-		let game_1 = sb.data.get(0).expect("First element is not available.");
-		let Game { home_team: h1, away_team: a1} = game_1;
-		assert_eq!(h1.name, home_team_name_1);
-		assert_eq!(h1.score, 0);
-		assert_eq!(a1.name, away_team_name_1);
-		assert_eq!(a1.score, 0);
-		let game_2 = sb.data.get(1).expect("Second element is not available.");
-		let Game { home_team: h2, away_team: a2} = game_2;
-		assert_eq!(h2.name, home_team_name_2);
-		assert_eq!(h2.score, 0);
-		assert_eq!(a2.name, away_team_name_2);
-		assert_eq!(a2.score, 0);
+		let Game { home_team: h_1, away_team: a_1} = sb.data.get(0).expect("First element is not available.");
+		assert_eq!(h_1.name, home_team_name_1);
+		assert_eq!(h_1.score, 0);
+		assert_eq!(a_1.name, away_team_name_1);
+		assert_eq!(a_1.score, 0);
+		let Game { home_team: h_2, away_team: a_2} = sb.data.get(1).expect("Second element is not available.");
+		assert_eq!(h_2.name, home_team_name_2);
+		assert_eq!(h_2.score, 0);
+		assert_eq!(a_2.name, away_team_name_2);
+		assert_eq!(a_2.score, 0);
 	}
 
 	#[test]
@@ -173,12 +180,12 @@ mod tests {
 
 	#[test]
 	fn new_game_shows_up_correctly() {
-		let home_team_name = String::from("India");
-		let away_team_name = String::from("Japan");
-		let expected_summary = String::from("India 0 - Japan 0");
+		let home_team_name = "India";
+		let away_team_name = "Japan";
+		let expected_summary = "India 0 - Japan 0";
 
 		let mut sb = ScoreBoard::new();
-		sb.start_game(home_team_name.clone(), away_team_name.clone()).expect("Couldn't create the game");
+		sb.start_game_with_literal_names(home_team_name, away_team_name).expect("Couldn't create the game");
 		let result = sb.get_summary();
 
 		assert_eq!(result.len(), 1);
@@ -188,16 +195,16 @@ mod tests {
 
 	#[test]
 	fn two_games_show_correctly() {
-		let home_team_name_1 = String::from("Uruguay");
-		let away_team_name_1 = String::from("Columbia");
-		let home_team_name_2 = String::from("Peru");
-		let away_team_name_2 = String::from("Chile");
-		let expected_summary_1 = String::from("Uruguay 0 - Columbia 0");
-		let expected_summary_2 = String::from("Peru 0 - Chile 0");
+		let home_team_name_1 = "Uruguay";
+		let away_team_name_1 = "Columbia";
+		let home_team_name_2 = "Peru";
+		let away_team_name_2 = "Chile";
+		let expected_summary_1 = "Uruguay 0 - Columbia 0";
+		let expected_summary_2 = "Peru 0 - Chile 0";
 
 		let mut sb = ScoreBoard::new();
-		sb.start_game(home_team_name_1.clone(), away_team_name_1.clone()).expect("Couldn't create the first game");
-		sb.start_game(home_team_name_2.clone(), away_team_name_2.clone()).expect("Couldn't create the second game");
+		sb.start_game_with_literal_names(home_team_name_1, away_team_name_1).expect("Couldn't create the first game");
+		sb.start_game_with_literal_names(home_team_name_2, away_team_name_2).expect("Couldn't create the second game");
 		let result = sb.get_summary();
 
 		assert_eq!(result.len(), 2);
@@ -209,13 +216,13 @@ mod tests {
 
 	#[test]
 	fn removing_a_single_game_leaves_the_score_board_empty() {
-		let home_team_name = String::from("New Zeland");
-		let away_team_name = String::from("Philippines");
+		let home_team_name = "New Zeland";
+		let away_team_name = "Philippines";
 		let nothing_to_show: Vec<String> = Vec::new();
 
 		let mut sb = ScoreBoard::new();
-		sb.start_game(home_team_name.clone(), away_team_name.clone()).expect("Couldn't create the game");
-		let result_1 = sb.finish_game(home_team_name.clone(), away_team_name.clone());
+		sb.start_game_with_literal_names(home_team_name, away_team_name).expect("Couldn't create the game");
+		let result_1 = sb.finish_game_with_literal_names(home_team_name, away_team_name);
 		let result_2 = sb.get_summary();
 
 		assert!(sb.data.is_empty());
@@ -225,16 +232,16 @@ mod tests {
 
 	#[test]
 	fn adding_after_removal_works() {
-		let home_team_name_1 = String::from("Austria");
-		let away_team_name_1 = String::from("Belarus");
-		let home_team_name_2 = String::from("Cyprus");
-		let away_team_name_2 = String::from("Latvia");
+		let home_team_name_1 = "Austria";
+		let away_team_name_1 = "Belarus";
+		let home_team_name_2 = "Cyprus";
+		let away_team_name_2 = "Latvia";
 		let expected_summary = vec![String::from("Cyprus 0 - Latvia 0")];
 
 		let mut sb = ScoreBoard::new();
-		sb.start_game(home_team_name_1.clone(), away_team_name_1.clone()).expect("Couldn't create the first game");
-		sb.finish_game(home_team_name_1.clone(), away_team_name_1.clone()).expect("Couldn't finish the first game");
-		let result_1 = sb.start_game(home_team_name_2.clone(), away_team_name_2.clone());
+		sb.start_game_with_literal_names(home_team_name_1, away_team_name_1).expect("Couldn't create the first game");
+		sb.finish_game_with_literal_names(home_team_name_1, away_team_name_1).expect("Couldn't finish the first game");
+		let result_1 = sb.start_game_with_literal_names(home_team_name_2, away_team_name_2);
 		let result_2 = sb.get_summary();
 
 		assert_eq!(sb.data.len(), 1);
@@ -244,12 +251,12 @@ mod tests {
 
 	#[test]
 	fn removal_on_empty_board_does_nothing() {
-		let home_team_name = String::from("Jamaica");
-		let away_team_name = String::from("Nicaragua");
+		let home_team_name = "Jamaica";
+		let away_team_name = "Nicaragua";
 		let nothing_to_show: Vec<String> = Vec::new();
 
 		let mut sb = ScoreBoard::new();
-		let result_1 = sb.finish_game(home_team_name.clone(), away_team_name.clone());
+		let result_1 = sb.finish_game_with_literal_names(home_team_name, away_team_name);
 		let result_2 = sb.get_summary();
 
 		assert!(sb.data.is_empty());
