@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use std::fmt;
 use std::string::String;
 use std::vec::Vec;
@@ -40,8 +38,12 @@ impl ScoreBoard {
 		Ok(())
 	}
 
-	pub fn finish_game(text: String) -> Result<(), String> {
-		println!("Function finish_game called with parameter '{}'", text);
+	pub fn finish_game(&mut self, home_name: String, away_name: String) -> Result<(), String> {
+		println!("Function finish_game called with parameters: '{0}' and '{1}'", home_name, away_name);
+
+		// TODO this will need more work
+		let _ = self.data.pop();
+		
 		Ok(())
 	}
 
@@ -205,4 +207,53 @@ mod tests {
 		assert_eq!(r_2, &expected_summary_2);
 	}
 
+	#[test]
+	fn removing_a_single_game_leaves_the_score_board_empty() {
+		let home_team_name = String::from("New Zeland");
+		let away_team_name = String::from("Philippines");
+		let nothing_to_show: Vec<String> = Vec::new();
+
+		let mut sb = ScoreBoard::new();
+		sb.start_game(home_team_name.clone(), away_team_name.clone()).expect("Couldn't create the game");
+		let result_1 = sb.finish_game(home_team_name.clone(), away_team_name.clone());
+		let result_2 = sb.get_summary();
+
+		assert!(sb.data.is_empty());
+		assert!(result_1.is_ok());
+		assert_eq!(result_2, nothing_to_show);
+	}
+
+	#[test]
+	fn adding_after_removal_works() {
+		let home_team_name_1 = String::from("Austria");
+		let away_team_name_1 = String::from("Belarus");
+		let home_team_name_2 = String::from("Cyprus");
+		let away_team_name_2 = String::from("Latvia");
+		let expected_summary = vec![String::from("Cyprus 0 - Latvia 0")];
+
+		let mut sb = ScoreBoard::new();
+		sb.start_game(home_team_name_1.clone(), away_team_name_1.clone()).expect("Couldn't create the first game");
+		sb.finish_game(home_team_name_1.clone(), away_team_name_1.clone()).expect("Couldn't finish the first game");
+		let result_1 = sb.start_game(home_team_name_2.clone(), away_team_name_2.clone());
+		let result_2 = sb.get_summary();
+
+		assert_eq!(sb.data.len(), 1);
+		assert!(result_1.is_ok());
+		assert_eq!(result_2, expected_summary);
+	}
+
+	#[test]
+	fn removal_on_empty_board_does_nothing() {
+		let home_team_name = String::from("Jamaica");
+		let away_team_name = String::from("Nicaragua");
+		let nothing_to_show: Vec<String> = Vec::new();
+
+		let mut sb = ScoreBoard::new();
+		let result_1 = sb.finish_game(home_team_name.clone(), away_team_name.clone());
+		let result_2 = sb.get_summary();
+
+		assert!(sb.data.is_empty());
+		assert!(result_1.is_ok());
+		assert_eq!(result_2, nothing_to_show);
+	}
 }
