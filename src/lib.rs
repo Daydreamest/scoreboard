@@ -41,9 +41,11 @@ impl ScoreBoard {
 	pub fn finish_game(&mut self, home_name: String, away_name: String) -> Result<(), String> {
 		println!("Function finish_game called with parameters: '{0}' and '{1}'", home_name, away_name);
 
-		// TODO this will need more work
-		let _ = self.data.pop();
-		
+		match self.find_game_index(home_name, away_name) {
+			Ok(game_index) => { let _ = self.data.remove(game_index); },
+			Err(e) => return Err(e),
+		}
+
 		Ok(())
 	}
 
@@ -93,6 +95,17 @@ impl ScoreBoard {
 
 	pub fn finish_game_with_literal_names(&mut self, home_name: &str, away_name: &str) -> Result<(), String> {
 		self.finish_game(String::from(home_name), String::from(away_name))
+	}
+
+	fn find_game_index(&self, home_name: String, away_name: String) -> Result<usize, String> {
+
+		for (id, game) in self.data.iter().enumerate() {
+			if game.home_team.name == home_name && game.away_team.name == away_name {
+				return Ok(id)
+			}
+		}
+
+		Err(String::from("No such game found"))
 	}
 }
 
@@ -238,14 +251,54 @@ mod tests {
 	}
 
 	#[test]
-	fn removal_on_empty_board_does_nothing() {
+	fn removal_on_empty_board_returns_an_error() {
+		let home_team_name = "Jamaica";
+		let away_team_name = "Nicaragua";
+		let expected_error_message = "No such game found";
+		let nothing_to_show: Vec<String> = Vec::new();
 
 		let mut sb = ScoreBoard::new();
 		let result_1 = sb.finish_game_with_literal_names(HOME_TEAM_NAME, AWAY_TEAM_NAME);
 		let result_2 = sb.get_summary();
 
 		assert!(sb.data.is_empty());
-		assert!(result_1.is_ok());
+		assert!(result_1.err().is_some_and(|result| result == expected_error_message));
 		assert_eq!(result_2, NOTHING_TO_SHOW);
+	}
+
+	#[test]
+	fn mismatched_home_and_away_names_in_removal_return_error() {
+		let home_team_name = "Quatar";
+		let away_team_name = "Tajikistan";
+		let expected_error_message = "No such game found";
+		let expected_summary = vec![String::from("Quatar 0 - Tajikistan 0")];
+
+		let mut sb = ScoreBoard::new();
+		sb.start_game_with_literal_names(home_team_name, away_team_name).expect("Couldn't create the game");
+		let result_1 = sb.finish_game_with_literal_names(away_team_name, home_team_name);
+		let result_2 = sb.get_summary();
+
+		assert_eq!(sb.data.len(), 1);
+		assert!(result_1.err().is_some_and(|result| result == expected_error_message));
+		assert_eq!(result_2, expected_summary);
+	}
+
+	#[test]
+	fn removal_of_wrong_team_returns_an_error() {
+		let home_team_name_1 = "Venezuela";
+		let away_team_name_1 = "Suriname";
+		let home_team_name_2 = "Cambodja";
+		let away_team_name_2 = "Vietnam";
+		let expected_error_message = "No such game found";
+		let expected_summary = vec![String::from("Venezuela 0 - Suriname 0")];
+
+		let mut sb = ScoreBoard::new();
+		sb.start_game_with_literal_names(home_team_name_1, away_team_name_1).expect("Couldn't create the game");
+		let result_1 = sb.finish_game_with_literal_names(away_team_name_2, home_team_name_2);
+		let result_2 = sb.get_summary();
+
+		assert_eq!(sb.data.len(), 1);
+		assert!(result_1.err().is_some_and(|result| result == expected_error_message));
+		assert_eq!(result_2, expected_summary);
 	}
 }
