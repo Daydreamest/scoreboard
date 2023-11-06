@@ -34,8 +34,8 @@ Develop a new live World Cup scorebard library that shows all the ongoing matche
 | 4. API | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | |
 | 4.1. Start | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Yes_Check_Circle.svg/240px-Yes_Check_Circle.svg.png" width="24" height="24"> | |
 | 4.2. Update | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | |
-| 4.3. Finish | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | |
-| 4.4. Summary | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Yes_Check_Circle.svg/240px-Yes_Check_Circle.svg.png" width="24" height="24"> | |
+| 4.3. Finish | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Yes_Check_Circle.svg/240px-Yes_Check_Circle.svg.png" width="24" height="24"> | |
+| 4.4. Summary | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | Missing proper ordering |
 
 ### Extra features
 
@@ -92,4 +92,4 @@ To run tests move to the "scoreboard" directory and run:
 
 ## Issues
 
-1. "match" is a keyword in Rust, so thw word "game" is used throughout the code in the meaning of "a match between two teams"
+1. "match" is a keyword in Rust, so the word "game" is used throughout the code in the meaning of "a match between two teams"

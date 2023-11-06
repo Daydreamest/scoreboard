@@ -1,5 +1,6 @@
 use std::fmt;
 use std::string::String;
+use std::string::ToString;
 use std::vec::Vec;
 
 // *********************
@@ -15,8 +16,12 @@ impl ScoreBoard {
 		ScoreBoard { data: Vec::new() }
 	}
 
-	pub fn start_game(&mut self, home_name: String, away_name: String) -> Result<(), String> {
+	pub fn start_game<T: ToString, U: ToString>(&mut self, home: T, away: U) -> Result<(), String> {
 		// TODO make sure the name isn't playing a game yet
+
+		let home_name = home.to_string();
+		let away_name = away.to_string();
+
 		println!("Function start_game called with parameters: '{0}' and '{1}'", home_name, away_name);
 
 		if home_name == away_name {
@@ -38,7 +43,11 @@ impl ScoreBoard {
 		Ok(())
 	}
 
-	pub fn finish_game(&mut self, home_name: String, away_name: String) -> Result<(), String> {
+	pub fn finish_game<T: ToString, U: ToString>(&mut self, home: T, away: U) -> Result<(), String> {
+
+		let home_name = home.to_string();
+		let away_name = away.to_string();
+
 		println!("Function finish_game called with parameters: '{0}' and '{1}'", home_name, away_name);
 
 		match self.find_game_index(home_name, away_name) {
@@ -89,14 +98,6 @@ impl fmt::Display for Game {
 }
 
 impl ScoreBoard {
-	pub fn start_game_with_literal_names(&mut self, home_name: &str, away_name: &str) -> Result<(), String> {
-		self.start_game(String::from(home_name), String::from(away_name))
-	}
-
-	pub fn finish_game_with_literal_names(&mut self, home_name: &str, away_name: &str) -> Result<(), String> {
-		self.finish_game(String::from(home_name), String::from(away_name))
-	}
-
 	fn find_game_index(&self, home_name: String, away_name: String) -> Result<usize, String> {
 
 		for (id, game) in self.data.iter().enumerate() {
@@ -141,7 +142,7 @@ mod tests {
 	#[test]
 	fn game_started_correctly() {
 		let mut sb = ScoreBoard::new();
-		let result = sb.start_game_with_literal_names(HOME_TEAM_NAME, AWAY_TEAM_NAME);
+		let result = sb.start_game(HOME_TEAM_NAME, AWAY_TEAM_NAME);
 
 		assert!(result.is_ok());
 		assert_eq!(sb.data.len(), 1);
@@ -157,7 +158,7 @@ mod tests {
 		let expected_error_message = format!("{} cannot play with itself", HOME_TEAM_NAME);
 
 		let mut sb = ScoreBoard::new();
-		let result = sb.start_game_with_literal_names(HOME_TEAM_NAME, HOME_TEAM_NAME);
+		let result = sb.start_game(HOME_TEAM_NAME, HOME_TEAM_NAME);
 
 		assert!(result.is_err());
 		assert!(result.err().is_some_and(|result| result == expected_error_message));
@@ -167,8 +168,8 @@ mod tests {
 	#[test]
 	fn two_games_started_correctly() {
 		let mut sb = ScoreBoard::new();
-		let result_1 = sb.start_game_with_literal_names(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1);
-		let result_2 = sb.start_game_with_literal_names(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2);
+		let result_1 = sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1);
+		let result_2 = sb.start_game(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2);
 
 		assert!(result_1.is_ok());
 		assert!(result_2.is_ok());
@@ -196,7 +197,7 @@ mod tests {
 	#[test]
 	fn new_game_shows_up_correctly() {
 		let mut sb = ScoreBoard::new();
-		sb.start_game_with_literal_names(HOME_TEAM_NAME, AWAY_TEAM_NAME).expect("Couldn't create the game");
+		sb.start_game(HOME_TEAM_NAME, AWAY_TEAM_NAME).expect("Couldn't create the game");
 		let result = sb.get_summary();
 
 		assert_eq!(result.len(), 1);
@@ -207,8 +208,8 @@ mod tests {
 	#[test]
 	fn two_games_show_correctly() {
 		let mut sb = ScoreBoard::new();
-		sb.start_game_with_literal_names(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
-		sb.start_game_with_literal_names(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2).expect("Couldn't create the second game");
+		sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
+		sb.start_game(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2).expect("Couldn't create the second game");
 		let result = sb.get_summary();
 
 		assert_eq!(result.len(), 2);
@@ -221,8 +222,8 @@ mod tests {
 	#[test]
 	fn removing_a_single_game_leaves_the_score_board_empty() {
 		let mut sb = ScoreBoard::new();
-		sb.start_game_with_literal_names(HOME_TEAM_NAME, AWAY_TEAM_NAME).expect("Couldn't create the game");
-		let result_1 = sb.finish_game_with_literal_names(HOME_TEAM_NAME, AWAY_TEAM_NAME);
+		sb.start_game(HOME_TEAM_NAME, AWAY_TEAM_NAME).expect("Couldn't create the game");
+		let result_1 = sb.finish_game(HOME_TEAM_NAME, AWAY_TEAM_NAME);
 		let result_2 = sb.get_summary();
 
 		assert!(sb.data.is_empty());
@@ -235,9 +236,9 @@ mod tests {
 		let expected_summary = vec![SCORELESS_GAME_2];
 
 		let mut sb = ScoreBoard::new();
-		sb.start_game_with_literal_names(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
-		sb.finish_game_with_literal_names(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't finish the first game");
-		let result_1 = sb.start_game_with_literal_names(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2);
+		sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
+		sb.finish_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't finish the first game");
+		let result_1 = sb.start_game(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2);
 		let result_2 = sb.get_summary();
 
 		assert_eq!(sb.data.len(), 1);
@@ -248,7 +249,7 @@ mod tests {
 	#[test]
 	fn removal_on_empty_board_returns_an_error() {
 		let mut sb = ScoreBoard::new();
-		let result_1 = sb.finish_game_with_literal_names(HOME_TEAM_NAME, AWAY_TEAM_NAME);
+		let result_1 = sb.finish_game(HOME_TEAM_NAME, AWAY_TEAM_NAME);
 		let result_2 = sb.get_summary();
 
 		assert!(sb.data.is_empty());
@@ -261,8 +262,8 @@ mod tests {
 		let expected_summary = vec![SCORELESS_GAME];
 
 		let mut sb = ScoreBoard::new();
-		sb.start_game_with_literal_names(HOME_TEAM_NAME, AWAY_TEAM_NAME).expect("Couldn't create the game");
-		let result_1 = sb.finish_game_with_literal_names(AWAY_TEAM_NAME, HOME_TEAM_NAME);
+		sb.start_game(HOME_TEAM_NAME, AWAY_TEAM_NAME).expect("Couldn't create the game");
+		let result_1 = sb.finish_game(AWAY_TEAM_NAME, HOME_TEAM_NAME);
 		let result_2 = sb.get_summary();
 
 		assert_eq!(sb.data.len(), 1);
@@ -275,8 +276,8 @@ mod tests {
 		let expected_summary = vec![SCORELESS_GAME_1];
 
 		let mut sb = ScoreBoard::new();
-		sb.start_game_with_literal_names(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the game");
-		let result_1 = sb.finish_game_with_literal_names(AWAY_TEAM_NAME_2, HOME_TEAM_NAME_2);
+		sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the game");
+		let result_1 = sb.finish_game(AWAY_TEAM_NAME_2, HOME_TEAM_NAME_2);
 		let result_2 = sb.get_summary();
 
 		assert_eq!(sb.data.len(), 1);
