@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::fmt;
 use std::string::String;
 use std::string::ToString;
@@ -35,6 +36,8 @@ impl ScoreBoard {
 			}
 		);
 
+		self.sort();
+
 		Ok(())
 	}
 
@@ -56,6 +59,8 @@ impl ScoreBoard {
 			Err(_) => return Err(String::from("Couldn't find a game for update")),
 		}
 
+		self.sort();
+
 		Ok(())
 	}
 
@@ -69,6 +74,8 @@ impl ScoreBoard {
 			Ok(game_index) => { let _ = self.data.remove(game_index); },
 			Err(_) => return Err(String::from("Couldn't find a game for removal")),
 		}
+
+		self.sort();
 
 		Ok(())
 	}
@@ -106,6 +113,13 @@ struct Game {
 	away_team: Team,
 }
 
+impl Game {
+	fn get_total_score(&self) -> u8 {
+		return self.home_team.score + self.away_team.score;
+	}
+
+}
+
 impl fmt::Display for Game {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{} - {}", self.home_team.to_string(), self.away_team.to_string())
@@ -135,6 +149,18 @@ impl ScoreBoard {
 		}
 
 		Err(format!("Couldn't find a game of team {}", team_name))
+	}
+
+	fn sort(&mut self) {
+		self.data.sort_by(|a, b| {
+			if a.get_total_score() < b.get_total_score() {
+				Ordering::Greater	// Because reverse order is needed, from greatest to smallest
+			} else if a.get_total_score() > b.get_total_score() {
+				Ordering::Less		// Because reverse order is needed, from greatest to smallest
+			} else {
+				Ordering::Equal
+			}
+		});
 	}
 }
 
@@ -509,7 +535,7 @@ mod tests {
 
 	#[test]
 	fn changing_the_score_for_last_team_of_many_works() {
-		let expected_summary = vec![String::from(SCORELESS_GAME_1), format!("{} 0 - {} 1", HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2)];
+		let expected_summary = vec![format!("{} 0 - {} 1", HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2), String::from(SCORELESS_GAME_1)];
 
 		let mut sb = ScoreBoard::new();
 		sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
@@ -544,5 +570,30 @@ mod tests {
 
 		assert!(result_1.err().is_some_and(|result| result == UPDATE_ERROR_MESSAGE));
 		assert_eq!(result_2, NOTHING_TO_SHOW);
+	}
+
+	#[test]
+	fn sorting_of_updated_games_works() {
+		let expected_summary_1 = vec![format!("{} 0 - {} 1", HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2), String::from(SCORELESS_GAME_1)];
+		let expected_summary_2 = vec![format!("{} 2 - {} 2", HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1), format!("{} 0 - {} 1", HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2)];
+		let expected_summary_3 = vec![format!("{} 3 - {} 2", HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2), format!("{} 2 - {} 2", HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1)];
+		let expected_summary_4 = vec![format!("{} 3 - {} 3", HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1), format!("{} 3 - {} 2", HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2)];
+
+		let mut sb = ScoreBoard::new();
+		sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
+		sb.start_game(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2).expect("Couldn't create the second game");
+		sb.update_score(HOME_TEAM_NAME_2, 0, AWAY_TEAM_NAME_2, 1).expect("Couldn't update the second game");
+		let result_1 = sb.get_summary();
+		sb.update_score(HOME_TEAM_NAME_1, 2, AWAY_TEAM_NAME_1, 2).expect("Couldn't update the first game");
+		let result_2 = sb.get_summary();
+		sb.update_score(HOME_TEAM_NAME_2, 3, AWAY_TEAM_NAME_2, 2).expect("Couldn't update the second game");
+		let result_3 = sb.get_summary();
+		sb.update_score(HOME_TEAM_NAME_1, 3, AWAY_TEAM_NAME_1, 3).expect("Couldn't update the first game");
+		let result_4 = sb.get_summary();
+
+		assert_eq!(result_1, expected_summary_1);
+		assert_eq!(result_2, expected_summary_2);
+		assert_eq!(result_3, expected_summary_3);
+		assert_eq!(result_4, expected_summary_4);
 	}
 }
