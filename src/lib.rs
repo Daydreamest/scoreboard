@@ -258,7 +258,7 @@ mod tests {
 	}
 
 	#[test]
-	fn mismatched_home_and_away_names_in_removal_return_error() {
+	fn mismatched_home_and_away_names_in_removal_return_an_error() {
 		let expected_summary = vec![SCORELESS_GAME];
 
 		let mut sb = ScoreBoard::new();
@@ -272,16 +272,107 @@ mod tests {
 	}
 
 	#[test]
-	fn removal_of_wrong_team_returns_an_error() {
+	fn removal_of_a_match_with_wrong_home_team_returns_an_error() {
 		let expected_summary = vec![SCORELESS_GAME_1];
-
 		let mut sb = ScoreBoard::new();
 		sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the game");
-		let result_1 = sb.finish_game(AWAY_TEAM_NAME_2, HOME_TEAM_NAME_2);
+		let result_1 = sb.finish_game(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_1);
 		let result_2 = sb.get_summary();
 
 		assert_eq!(sb.data.len(), 1);
 		assert!(result_1.err().is_some_and(|result| result == REMOVAL_ERROR_MESSAGE));
 		assert_eq!(result_2, expected_summary);
 	}
+
+	#[test]
+	fn removal_of_a_match_with_wrong_away_team_returns_an_error() {
+		let expected_summary = vec![SCORELESS_GAME_1];
+		let mut sb = ScoreBoard::new();
+		sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the game");
+		let result_1 = sb.finish_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_2);
+		let result_2 = sb.get_summary();
+
+		assert_eq!(sb.data.len(), 1);
+		assert!(result_1.err().is_some_and(|result| result == REMOVAL_ERROR_MESSAGE));
+		assert_eq!(result_2, expected_summary);
+	}
+
+	#[test]
+	fn removal_of_wrong_teams_returns_an_error() {
+		let expected_summary = vec![SCORELESS_GAME_1];
+
+		let mut sb = ScoreBoard::new();
+		sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the game");
+		let result_1 = sb.finish_game(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2);
+		let result_2 = sb.get_summary();
+
+		assert_eq!(sb.data.len(), 1);
+		assert!(result_1.err().is_some_and(|result| result == REMOVAL_ERROR_MESSAGE));
+		assert_eq!(result_2, expected_summary);
+	}
+
+	#[test]
+	fn removing_the_last_game_works() {
+		let expected_summary = vec![SCORELESS_GAME_1];
+
+		let mut sb = ScoreBoard::new();
+		sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
+		sb.start_game(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2).expect("Couldn't create the second game");
+		let result_1 = sb.finish_game(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2);
+		let result_2 = sb.get_summary();
+
+		assert_eq!(sb.data.len(), 1);
+		assert!(result_1.is_ok());
+		assert_eq!(result_2, expected_summary);
+	}
+
+	#[test]
+	fn removing_the_first_game_works() {
+		let expected_summary = vec![SCORELESS_GAME_2];
+
+		let mut sb = ScoreBoard::new();
+		sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
+		sb.start_game(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2).expect("Couldn't create the second game");
+		let result_1 = sb.finish_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1);
+		let result_2 = sb.get_summary();
+
+		assert_eq!(sb.data.len(), 1);
+		assert!(result_1.is_ok());
+		assert_eq!(result_2, expected_summary);
+	}
+
+	#[test]
+	fn removing_the_mid_game_works() {
+		let expected_summary = vec![SCORELESS_GAME_1, SCORELESS_GAME_2];
+
+		let mut sb = ScoreBoard::new();
+		sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
+		sb.start_game(HOME_TEAM_NAME, AWAY_TEAM_NAME).expect("Couldn't create the second game");
+		sb.start_game(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2).expect("Couldn't create the third game");
+		let result_1 = sb.finish_game(HOME_TEAM_NAME, AWAY_TEAM_NAME);
+		let result_2 = sb.get_summary();
+
+		assert_eq!(sb.data.len(), 2);
+		assert!(result_1.is_ok());
+		assert_eq!(result_2, expected_summary);
+	}
+
+	#[test]
+	fn creating_and_removing_many_games_leaves_an_empty_board() {
+		let mut sb = ScoreBoard::new();
+		sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
+		sb.start_game(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2).expect("Couldn't create the second game");
+		sb.start_game(HOME_TEAM_NAME, AWAY_TEAM_NAME).expect("Couldn't create the third game");
+		let result_1 = sb.finish_game(HOME_TEAM_NAME, AWAY_TEAM_NAME);
+		let result_2 = sb.finish_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1);
+		let result_3 = sb.finish_game(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2);
+		let result_4 = sb.get_summary();
+
+		assert_eq!(sb.data.len(), 0);
+		assert!(result_1.is_ok());
+		assert!(result_2.is_ok());
+		assert!(result_3.is_ok());
+		assert_eq!(result_4, NOTHING_TO_SHOW);
+	}
+
 }
