@@ -2,6 +2,7 @@ use std::cmp::Ordering;
 use std::fmt;
 use std::string::String;
 use std::string::ToString;
+use std::time::Instant;
 use std::vec::Vec;
 
 // *********************
@@ -32,7 +33,8 @@ impl ScoreBoard {
 		self.data.push(
 			Game {
 				home_team : Team { name: home_name, score: 0 },
-				away_team : Team { name: away_name, score: 0 }
+				away_team : Team { name: away_name, score: 0 },
+				start_time: Instant::now(),
 			}
 		);
 
@@ -51,7 +53,8 @@ impl ScoreBoard {
 			Ok(game_index) => {
 				let new_game_result = Game {
 					home_team : Team { name: home_name, score: new_home_score },
-					away_team : Team { name: away_name, score: new_away_score }
+					away_team : Team { name: away_name, score: new_away_score },
+					start_time : self.data[game_index].start_time,
 				};
 
 				let _ = std::mem::replace(&mut self.data[game_index], new_game_result);
@@ -111,6 +114,7 @@ impl fmt::Display for Team {
 struct Game {
 	home_team: Team,
 	away_team: Team,
+	start_time: Instant,
 }
 
 impl Game {
@@ -158,7 +162,13 @@ impl ScoreBoard {
 			} else if a.get_total_score() > b.get_total_score() {
 				Ordering::Less		// Because reverse order is needed, from greatest to smallest
 			} else {
-				Ordering::Equal
+				if a.start_time < b.start_time {
+					Ordering::Less		// Because second ordering is normal, from smallest timestamp to greatest
+				} else if a.start_time < b.start_time {
+					Ordering::Greater	// Because second ordering is normal, from smallest timestamp to greatest
+				} else {
+					Ordering::Equal
+				}
 			}
 		});
 	}
@@ -209,7 +219,7 @@ mod tests {
 
 		assert!(result.is_ok());
 		assert_eq!(sb.data.len(), 1);
-		let Game { home_team: h, away_team: a} = sb.data.first().expect("First element is not available.");
+		let Game { home_team: h, away_team: a, start_time: _} = sb.data.first().expect("First element is not available.");
 		assert_eq!(h.name, HOME_TEAM_NAME);
 		assert_eq!(h.score, 0);
 		assert_eq!(a.name, AWAY_TEAM_NAME);
@@ -237,12 +247,12 @@ mod tests {
 		assert!(result_1.is_ok());
 		assert!(result_2.is_ok());
 		assert_eq!(sb.data.len(), 2);
-		let Game { home_team: h_1, away_team: a_1} = sb.data.get(0).expect("First element is not available.");
+		let Game { home_team: h_1, away_team: a_1, start_time: _} = sb.data.get(0).expect("First element is not available.");
 		assert_eq!(h_1.name, HOME_TEAM_NAME_1);
 		assert_eq!(h_1.score, 0);
 		assert_eq!(a_1.name, AWAY_TEAM_NAME_1);
 		assert_eq!(a_1.score, 0);
-		let Game { home_team: h_2, away_team: a_2} = sb.data.get(1).expect("Second element is not available.");
+		let Game { home_team: h_2, away_team: a_2, start_time: _} = sb.data.get(1).expect("Second element is not available.");
 		assert_eq!(h_2.name, HOME_TEAM_NAME_2);
 		assert_eq!(h_2.score, 0);
 		assert_eq!(a_2.name, AWAY_TEAM_NAME_2);
@@ -595,5 +605,22 @@ mod tests {
 		assert_eq!(result_2, expected_summary_2);
 		assert_eq!(result_3, expected_summary_3);
 		assert_eq!(result_4, expected_summary_4);
+	}
+
+	#[test]
+	fn secondary_sorting_by_start_time_works() {
+		let expected_summary_1 = vec![format!("{} 1 - {} 1", HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2), String::from(SCORELESS_GAME_1)];
+		let expected_summary_2 = vec![format!("{} 1 - {} 1", HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1), format!("{} 1 - {} 1", HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2)];
+
+		let mut sb = ScoreBoard::new();
+		sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
+		sb.start_game(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2).expect("Couldn't create the second game");
+		sb.update_score(HOME_TEAM_NAME_2, 1, AWAY_TEAM_NAME_2, 1).expect("Couldn't update the second game");
+		let result_1 = sb.get_summary();
+		sb.update_score(HOME_TEAM_NAME_1, 1, AWAY_TEAM_NAME_1, 1).expect("Couldn't update the first game");
+		let result_2 = sb.get_summary();
+
+		assert_eq!(result_1, expected_summary_1);
+		assert_eq!(result_2, expected_summary_2);
 	}
 }

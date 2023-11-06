@@ -32,11 +32,11 @@ Develop a new live World Cup scorebard library that shows all the ongoing matche
 | 1. Library | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Yes_Check_Circle.svg/240px-Yes_Check_Circle.svg.png" width="24" height="24"> | Devloped as an independant Rust library |
 | 2. Storage | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Yes_Check_Circle.svg/240px-Yes_Check_Circle.svg.png" width="24" height="24"> | Using standard vector cotainer. See "Possible additional features -> Optimization" below for more comments on this |
 | 3. TDD | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Yes_Check_Circle.svg/240px-Yes_Check_Circle.svg.png" width="24" height="24"> | TDD followed to a degree. Most functions are so small it was possible to write the final correct version for the first test and then add the other corner cases |
-| 4. API | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | |
+| 4. API | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Yes_Check_Circle.svg/240px-Yes_Check_Circle.svg.png" width="24" height="24"> | Public `ScoreBoard` struct and its methods |
 | 4.1. Start | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Yes_Check_Circle.svg/240px-Yes_Check_Circle.svg.png" width="24" height="24"> | `ScoreBoard.start_game(home_team_name, away_team_name)` |
 | 4.2. Update | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Yes_Check_Circle.svg/240px-Yes_Check_Circle.svg.png" width="24" height="24"> | `ScoreBoard.update_score(home_team_name, home_score, away_team_name, away_score)` |
 | 4.3. Finish | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Yes_Check_Circle.svg/240px-Yes_Check_Circle.svg.png" width="24" height="24"> | `ScoreBoard.finish_game(home_team_name, away_team_name)`|
-| 4.4. Summary | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | `ScoreBoard.get_summary()` Missing proper ordering |
+| 4.4. Summary | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Yes_Check_Circle.svg/240px-Yes_Check_Circle.svg.png" width="24" height="24"> | `ScoreBoard.get_summary()` |
 
 ### Extra features
 
@@ -90,6 +90,9 @@ To run tests move to the "scoreboard" directory and run:
 ### API
 
 ### Optimization
+
+1. Time stamps are used to verify which match started first. This may be an overkill, but it's cleaner and easier than implementing internal counters, at the cost of being less efficient on the CPU
+2. Vector is used as a data container. There are others collections available, but even the [Rust guide](https://doc.rust-lang.org/std/collections/index.html) suggests sticking to the vector. Alternatives could be consider to improve efficiency, but they would need profiling and real world usage of the library
 
 ## Issues
 
