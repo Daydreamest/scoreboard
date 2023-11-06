@@ -50,9 +50,9 @@ impl ScoreBoard {
 
 		println!("Function finish_game called with parameters: '{0}' and '{1}'", home_name, away_name);
 
-		match self.find_game_index(home_name, away_name) {
+		match self.find_game_index(&home_name, &away_name) {
 			Ok(game_index) => { let _ = self.data.remove(game_index); },
-			Err(e) => return Err(e),
+			Err(_) => return Err(String::from("Couldn't find a game for removal")),
 		}
 
 		Ok(())
@@ -98,15 +98,28 @@ impl fmt::Display for Game {
 }
 
 impl ScoreBoard {
-	fn find_game_index(&self, home_name: String, away_name: String) -> Result<usize, String> {
+	fn find_game_index(&self, home_name: &String, away_name:&String) -> Result<usize, String> {
+		match self.find_game_index_of_team(&home_name) {
+			Ok(game_index) => {
+				let game = self.data.get(game_index).expect("Index out of bounds");
+				if &game.home_team.name == home_name && &game.away_team.name == away_name {
+					return Ok(game_index)
+				} else {
+					return Err(format!("Team {} isn't playing with {} currently", home_name, away_name))
+				}
+			},
+			Err(_) => return Err(format!("Couldn't find a game of teams: {} and {}", home_name, away_name)),
+		}
+	}
 
+	fn find_game_index_of_team(&self, team_name: &String) -> Result<usize, String> {
 		for (id, game) in self.data.iter().enumerate() {
-			if game.home_team.name == home_name && game.away_team.name == away_name {
+			if &game.home_team.name == team_name || &game.away_team.name == team_name {
 				return Ok(id)
 			}
 		}
 
-		Err(String::from("Couldn't find a game for removal"))
+		Err(format!("Couldn't find a game of team {}", team_name))
 	}
 }
 
