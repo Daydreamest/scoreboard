@@ -165,7 +165,7 @@ mod tests {
 		match id {
 			1 => return vec![String::from(SCORELESS_GAME_1)],
 			2 => return vec![String::from(SCORELESS_GAME_2)],
-			_ => return vec![String::from(SCORELESS_GAME)]
+			_ => return vec![String::from(SCORELESS_GAME)],
 		}
 	}
 
@@ -482,4 +482,67 @@ mod tests {
 		assert_eq!(result_2, get_summary_of_scoreless_game(1));
 	}
 
+	#[test]
+	fn changing_the_score_for_mismatched_home_and_away_teams_is_an_error() {
+		let mut sb = ScoreBoard::new();
+		sb.start_game(HOME_TEAM_NAME, AWAY_TEAM_NAME).expect("Couldn't create the game");
+		let result_1 = sb.update_score(AWAY_TEAM_NAME, 0, HOME_TEAM_NAME, 1);
+		let result_2 = sb.get_summary();
+
+		assert!(result_1.err().is_some_and(|result| result == UPDATE_ERROR_MESSAGE));
+		assert_eq!(result_2, get_summary_of_scoreless_game(0));
+	}
+
+	#[test]
+	fn changing_the_score_for_first_team_of_many_works() {
+		let expected_summary = vec![format!("{} 1 - {} 0", HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1), String::from(SCORELESS_GAME_2)];
+
+		let mut sb = ScoreBoard::new();
+		sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
+		sb.start_game(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2).expect("Couldn't create the second game");
+		let result_1 = sb.update_score(HOME_TEAM_NAME_1, 1, AWAY_TEAM_NAME_1, 0);
+		let result_2 = sb.get_summary();
+
+		assert!(result_1.is_ok());
+		assert_eq!(result_2, expected_summary);
+	}
+
+	#[test]
+	fn changing_the_score_for_last_team_of_many_works() {
+		let expected_summary = vec![String::from(SCORELESS_GAME_1), format!("{} 0 - {} 1", HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2)];
+
+		let mut sb = ScoreBoard::new();
+		sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
+		sb.start_game(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2).expect("Couldn't create the second game");
+		let result_1 = sb.update_score(HOME_TEAM_NAME_2, 0, AWAY_TEAM_NAME_2, 1);
+		let result_2 = sb.get_summary();
+
+		assert!(result_1.is_ok());
+		assert_eq!(result_2, expected_summary);
+	}
+
+	#[test]
+	fn removing_game_with_changed_score_works() {
+		let mut sb = ScoreBoard::new();
+		sb.start_game(HOME_TEAM_NAME, AWAY_TEAM_NAME).expect("Couldn't create the game");
+		let result_1 = sb.update_score(HOME_TEAM_NAME, 0, AWAY_TEAM_NAME, 1);
+		let result_2 = sb.finish_game(HOME_TEAM_NAME, AWAY_TEAM_NAME);
+		let result_3 = sb.get_summary();
+
+		assert!(result_1.is_ok());
+		assert!(result_2.is_ok());
+		assert_eq!(result_3, NOTHING_TO_SHOW);
+	}
+
+	#[test]
+	fn changing_score_of_removed_game_is_an_error() {
+		let mut sb = ScoreBoard::new();
+		sb.start_game(HOME_TEAM_NAME, AWAY_TEAM_NAME).expect("Couldn't create the game");
+		sb.finish_game(HOME_TEAM_NAME, AWAY_TEAM_NAME).expect("Couldn't finish a game");
+		let result_1 = sb.update_score(HOME_TEAM_NAME, 0, AWAY_TEAM_NAME, 1);
+		let result_2 = sb.get_summary();
+
+		assert!(result_1.err().is_some_and(|result| result == UPDATE_ERROR_MESSAGE));
+		assert_eq!(result_2, NOTHING_TO_SHOW);
+	}
 }
