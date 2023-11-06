@@ -20,7 +20,8 @@ Develop a new live World Cup scorebard library that shows all the ongoing matche
 1. No specific programming language is expected. For learning purposes, this project will use [Rust](https://www.rust-lang.org/)
 2. There is no mention of thread safety. It's assumed to be a "nice to have" feature
 3. A team can be playing a single match only at a given time. For example, if there is a currently ongoing match between Honduras and Costarica, neither of those two teams can be present in a newly created match
-4. Getting a summary of the current results will be much more frequently used than all the other API functions combined. This will impact optimization choices
+4. In all the API calls, "home" team always comes before "away" team. If the order of the teams is wrong for an operation, it returns an error
+5. Getting a summary of the current results will be much more frequently used than all the other API functions combined. This will impact optimization choices
 
 ## Progress
 
@@ -28,8 +29,8 @@ Develop a new live World Cup scorebard library that shows all the ongoing matche
 
 | Requirement | Status | Comments |
 | ------ | ------ | ------ |
-| 1. Library | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Yes_Check_Circle.svg/240px-Yes_Check_Circle.svg.png" width="24" height="24"> | |
-| 2. Storage | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | |
+| 1. Library | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Yes_Check_Circle.svg/240px-Yes_Check_Circle.svg.png" width="24" height="24"> | Devloped as an independant Rust library |
+| 2. Storage | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Yes_Check_Circle.svg/240px-Yes_Check_Circle.svg.png" width="24" height="24"> | Using standard vector cotainer. See "Possible additional features -> Optimization" below for more comments on this |
 | 3. TDD | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | |
 | 4. API | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | |
 | 4.1. Start | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Yes_Check_Circle.svg/240px-Yes_Check_Circle.svg.png" width="24" height="24"> | |
@@ -42,7 +43,7 @@ Develop a new live World Cup scorebard library that shows all the ongoing matche
 | Features | Status | Comments |
 | ------ | ------ | ------ |
 | Team uniqueness | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | |
-| Thread safety | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | |
+| Thread safety | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Yes_Check_Circle.svg/240px-Yes_Check_Circle.svg.png" width="24" height="24"> | Rust compiler provides thread safety, unless serious hacks get involved. There is no `unsafe` code in this repository |
 
 ## Installation and usage
 
