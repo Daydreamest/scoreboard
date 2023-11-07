@@ -42,7 +42,7 @@ Develop a new live World Cup scorebard library that shows all the ongoing matche
 
 | Features | Status | Comments |
 | ------ | ------ | ------ |
-| Team uniqueness | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/No_icon_red.svg/240px-No_icon_red.svg.png" width="24" height="24"> | |
+| Team uniqueness | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Yes_Check_Circle.svg/240px-Yes_Check_Circle.svg.png" width="24" height="24"> | `start_game(team1, team2)` rejects the request if any of the teams is already playing a match |
 | Thread safety | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Yes_Check_Circle.svg/240px-Yes_Check_Circle.svg.png" width="24" height="24"> | Rust compiler provides thread safety, unless serious hacks get involved. There is no `unsafe` code in this repository |
 
 ## Installation and usage
@@ -92,7 +92,7 @@ To run tests move to the "scoreboard" directory and run:
 ### Optimization
 
 1. Time stamps are used to verify which match started first. This may be an overkill, but it's cleaner and easier than implementing internal counters, at the cost of being less efficient on the CPU
-2. Vector is used as a data container. There are others collections available, but even the [Rust guide](https://doc.rust-lang.org/std/collections/index.html) suggests sticking to the vector. Alternatives could be consider to improve efficiency, but they would need profiling and real world usage of the library
+2. Vector is used as a data container. There are others collections available, but even the [Rust guide](https://doc.rust-lang.org/std/collections/index.html) suggests sticking to the vector. Alternatives could be considered to improve efficiency, but they would need profiling and real world usage of the library
 
 ## Issues
 

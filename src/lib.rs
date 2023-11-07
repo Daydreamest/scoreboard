@@ -19,12 +19,21 @@ impl ScoreBoard {
 	}
 
 	pub fn start_game<T: ToString, U: ToString>(&mut self, home: T, away: U) -> Result<(), String> {
-		// TODO make sure the name isn't playing a game yet
 
 		let home_name = home.to_string();
 		let away_name = away.to_string();
 
 		println!("Function start_game called with parameters: '{0}' and '{1}'", home_name, away_name);
+
+		match self.find_game_index_of_team(&home_name) {
+			Ok(_) => return Err(format!("{} is already playing a game", home_name)),
+			Err(_) => ()
+		}
+
+		match self.find_game_index_of_team(&away_name) {
+			Ok(_) => return Err(format!("{} is already playing a game", away_name)),
+			Err(_) => ()
+		}
 
 		if home_name == away_name {
 			return Err(format!("{} cannot play with itself", home_name));
@@ -172,6 +181,7 @@ impl ScoreBoard {
 			}
 		});
 	}
+
 }
 
 // ***********
@@ -196,13 +206,17 @@ mod tests {
 	const NOTHING_TO_SHOW: Vec<String> = Vec::new();
 	const REMOVAL_ERROR_MESSAGE: &str = "Couldn't find a game for removal";
 	const UPDATE_ERROR_MESSAGE: &str = "Couldn't find a game for update";
-
-	fn get_summary_of_scoreless_game(id :u8) -> Vec<String> {
+	
+	fn get_summary_of_scoreless_game(id: u8) -> Vec<String> {
 		match id {
 			1 => return vec![String::from(SCORELESS_GAME_1)],
 			2 => return vec![String::from(SCORELESS_GAME_2)],
 			_ => return vec![String::from(SCORELESS_GAME)],
 		}
+	}
+
+	fn get_team_already_paying_message(team_name: &str) -> String {
+		return format!("{} is already playing a game", team_name);
 	}
 
 	#[test]
@@ -623,4 +637,74 @@ mod tests {
 		assert_eq!(result_1, expected_summary_1);
 		assert_eq!(result_2, expected_summary_2);
 	}
+
+	#[test]
+	fn home_team_cannot_be_added_to_a_second_concurrent_match() {
+		let mut sb = ScoreBoard::new();
+		sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
+		let result_1 = sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_2);
+		let result_2 = sb.get_summary();
+
+		assert!(result_1.err().is_some_and(|result| result == get_team_already_paying_message(HOME_TEAM_NAME_1)));
+		assert_eq!(result_2,get_summary_of_scoreless_game(1));
+	}
+
+	#[test]
+	fn away_team_cannot_be_added_to_a_second_concurrent_match() {
+		let mut sb = ScoreBoard::new();
+		sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
+		let result_1 = sb.start_game(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_1);
+		let result_2 = sb.get_summary();
+
+		assert!(result_1.err().is_some_and(|result| result == get_team_already_paying_message(AWAY_TEAM_NAME_1)));
+		assert_eq!(result_2,get_summary_of_scoreless_game(1));
+	}
+
+	#[test]
+	fn home_team_cannot_be_added_to_a_second_concurrent_match_as_away_team() {
+		let mut sb = ScoreBoard::new();
+		sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
+		let result_1 = sb.start_game(HOME_TEAM_NAME_2, HOME_TEAM_NAME_1);
+		let result_2 = sb.get_summary();
+
+		assert!(result_1.err().is_some_and(|result| result == get_team_already_paying_message(HOME_TEAM_NAME_1)));
+		assert_eq!(result_2,get_summary_of_scoreless_game(1));
+	}
+
+	#[test]
+	fn away_team_cannot_be_added_to_a_second_concurrent_match_as_home_team() {
+		let mut sb = ScoreBoard::new();
+		sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
+		let result_1 = sb.start_game(AWAY_TEAM_NAME_1, AWAY_TEAM_NAME_2);
+		let result_2 = sb.get_summary();
+
+		assert!(result_1.err().is_some_and(|result| result == get_team_already_paying_message(AWAY_TEAM_NAME_1)));
+		assert_eq!(result_2,get_summary_of_scoreless_game(1));
+	}
+
+	#[test]
+	fn both_teams_cannot_start_a_new_match_mismatched() {
+		let mut sb = ScoreBoard::new();
+		sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
+		let result_1 = sb.start_game(AWAY_TEAM_NAME_1, HOME_TEAM_NAME_1);
+		let result_2 = sb.get_summary();
+
+		assert!(result_1.err().is_some_and(|result| result == get_team_already_paying_message(AWAY_TEAM_NAME_1)));
+		assert_eq!(result_2,get_summary_of_scoreless_game(1));
+	}
+
+	#[test]
+	fn match_will_not_start_if_both_teams_are_already_playing() {
+		let expected_summary = vec![String::from(SCORELESS_GAME_1), String::from(SCORELESS_GAME_2)];
+
+		let mut sb = ScoreBoard::new();
+		sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
+		sb.start_game(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2).expect("Couldn't create the second game");
+		let result_1 = sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_2);
+		let result_2 = sb.get_summary();
+
+		assert!(result_1.err().is_some_and(|result| result == get_team_already_paying_message(HOME_TEAM_NAME_1)));
+		assert_eq!(result_2, expected_summary);
+	}
+
 }
