@@ -25,19 +25,11 @@ impl ScoreBoard {
 
 		println!("Function start_game called with parameters: '{0}' and '{1}'", home_name, away_name);
 
-		match self.find_game_index_of_team(&home_name) {
-			Ok(_) => return Err(format!("{} is already playing a game", home_name)),
-			Err(_) => ()
-		}
-
-		match self.find_game_index_of_team(&away_name) {
-			Ok(_) => return Err(format!("{} is already playing a game", away_name)),
-			Err(_) => ()
-		}
-
 		if home_name == away_name {
 			return Err(format!("{} cannot play with itself", home_name));
 		}
+
+		self.check_if_currently_playing(&home_name, &away_name)?;
 
 		self.data.push(
 			Game {
@@ -143,7 +135,7 @@ impl ScoreBoard {
 	fn find_game_index(&self, home_name: &String, away_name:&String) -> Result<usize, String> {
 		match self.find_game_index_of_team(&home_name) {
 			Ok(game_index) => {
-				let game = self.data.get(game_index).expect("Index out of bounds");
+				let game = self.data.get(game_index).unwrap();
 				if &game.home_team.name == home_name && &game.away_team.name == away_name {
 					return Ok(game_index)
 				} else {
@@ -182,6 +174,19 @@ impl ScoreBoard {
 		});
 	}
 
+	fn check_if_currently_playing(&self, home_name: &String, away_name:&String) -> Result<(), String> {
+		match self.find_game_index_of_team(&home_name) {
+			Ok(_) => return Err(format!("{} is already playing a game", home_name)),
+			Err(_) => ()
+		}
+
+		match self.find_game_index_of_team(&away_name) {
+			Ok(_) => return Err(format!("{} is already playing a game", away_name)),
+			Err(_) => ()
+		}
+
+		Ok(())
+	}
 }
 
 // ***********
