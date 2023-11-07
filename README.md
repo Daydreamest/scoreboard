@@ -63,6 +63,20 @@ On the first execution Cargo may download dependencies and libraries. After that
 
 `scoreboard/target/release/libscoreboard.rlib`
 
+### Documentation
+
+The project is documented in code
+
+#### Manually generated
+
+Run this command to generate documentation and open it:
+
+`cargo doc --open`
+
+#### Online
+
+The generated documentation is available on GitHub Pages under [daydreamest.github.io](https://daydreamest.github.io/scoreboard/scoreboard/)
+
 ### Usage
 
 #### As Rust source code
