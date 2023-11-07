@@ -9,15 +9,41 @@ use std::vec::Vec;
 // Public API functions
 // *********************
 
+/// Score board representation
 pub struct ScoreBoard {
+	/// In-memory data storage, using `Game` struct as a representation of a single ongoing game
 	data: Vec<Game>
 }
 
 impl ScoreBoard {
+	/// Returns a newly created, empty score board
 	pub fn new() -> ScoreBoard {
 		ScoreBoard { data: Vec::new() }
 	}
 
+	/// Starts a game between two teams, with initial score 0 - 0
+	///
+	/// # Arguments
+	///
+	/// * `home` - Name of the home team. Must be either a `String` or a type that is convertable to `String`
+	/// * `away` - Name of the away team. Must be either a `String` or a type that is convertable to `String`
+	///
+	/// # Errors
+	///
+	/// * When the two provided names are the same
+	/// * When any of the provided team is currently playing a match
+	///
+	/// # Examples
+	///
+	/// ```
+	/// let mut expected_result: Vec<String> = Vec::new();
+	/// expected_result.push(String::from("Japan 0 - Indonesia 0"));
+	///
+	/// let mut sb = scoreboard::ScoreBoard::new();
+	/// sb.start_game("Japan", "Indonesia");
+	/// let summary = sb.get_summary();
+	/// assert_eq!(summary, expected_result);
+	/// ```
 	pub fn start_game<T: ToString, U: ToString>(&mut self, home: T, away: U) -> Result<(), String> {
 
 		let home_name = home.to_string();
@@ -44,6 +70,31 @@ impl ScoreBoard {
 		Ok(())
 	}
 
+	/// Updates a score of a running match with absolute values
+	///
+	/// # Arguments
+	///
+	/// * `home` - Name of the home team. Must be either a `String` or a type that is convertable to `String`
+	/// * `new_home_score` - A new score to be set for the home team
+	/// * `away` - Name of the away team. Must be either a `String` or a type that is convertable to `String`
+	/// * `new_away_score` - A new score to be set for the away team
+	///
+	/// # Errors
+	///
+	/// * When there is no active match between the given teams
+	///
+	/// # Examples
+	///
+	/// ```
+	/// let mut expected_result: Vec<String> = Vec::new();
+	/// expected_result.push(String::from("Japan 2 - Indonesia 0"));
+	///
+	/// let mut sb = scoreboard::ScoreBoard::new();
+	/// sb.start_game("Japan", "Indonesia");
+	/// sb.update_score("Japan", 2, "Indonesia", 0);
+	/// let summary = sb.get_summary();
+	/// assert_eq!(summary, expected_result);
+	/// ```
 	pub fn update_score<T: ToString, U: ToString>(&mut self, home: T, new_home_score: u8, away: U, new_away_score: u8) -> Result<(), String> {
 		let home_name = home.to_string();
 		let away_name = away.to_string();
@@ -68,6 +119,29 @@ impl ScoreBoard {
 		Ok(())
 	}
 
+	/// Finishes a match and removes it from the score board
+	///
+	/// # Arguments
+	///
+	/// * `home` - Name of the home team. Must be either a `String` or a type that is convertable to `String`
+	/// * `away` - Name of the away team. Must be either a `String` or a type that is convertable to `String`
+	///
+	/// # Errors
+	///
+	/// * When there is no active match between the given teams
+	///
+	/// # Examples
+	///
+	/// ```
+	/// let mut expected_result: Vec<String> = Vec::new();
+	///
+	/// let mut sb = scoreboard::ScoreBoard::new();
+	/// sb.start_game("Japan", "Indonesia");
+	/// sb.update_score("Japan", 2, "Indonesia", 0);
+	/// sb.finish_game("Japan", "Indonesia");
+	/// let summary = sb.get_summary();
+	/// assert_eq!(summary, expected_result);
+	/// ```
 	pub fn finish_game<T: ToString, U: ToString>(&mut self, home: T, away: U) -> Result<(), String> {
 		let home_name = home.to_string();
 		let away_name = away.to_string();
@@ -84,6 +158,23 @@ impl ScoreBoard {
 		Ok(())
 	}
 
+	/// Provides the current status of the scoreboard, with all current matches listed. The matches are ordered by total score (the highest coming first) and, in the case of the same score, by start time (the earliest match coming first)
+	///
+	/// # Returns
+	///
+	/// * A vector of strings, each string containing the home team, its score, the away team and its score
+	///
+	/// # Examples
+	///
+	/// ```
+	/// let mut expected_result: Vec<String> = Vec::new();
+	/// expected_result.push(String::from("Japan 0 - Indonesia 0"));
+	///
+	/// let mut sb = scoreboard::ScoreBoard::new();
+	/// sb.start_game("Japan", "Indonesia");
+	/// let summary = sb.get_summary();
+	/// assert_eq!(summary, expected_result);
+	/// ```
 	pub fn get_summary(&self) -> Vec<String> {
 		println!("Function get_summary called");
 		
@@ -101,37 +192,85 @@ impl ScoreBoard {
 // Private library functions and structures
 // *****************************************
 
+/// A representation of a team
 struct Team {
+	/// Team's name
 	name: String,
+	/// Team's score
 	score: u8,
 }
 
 impl fmt::Display for Team {
+	/// Implementation of `Display` trait, allowing it to be converted to a String
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{} {}", self.name, self.score)
     }
 }
 
+/// A representation of a match
 struct Game {
+	/// Home team structure
 	home_team: Team,
+	/// Away team structure
 	away_team: Team,
+	/// Timestamp of the start of the match
 	start_time: Instant,
 }
 
 impl Game {
+	/// Calculates a total score of the match, which is a sum of the scores of both teams
 	fn get_total_score(&self) -> u8 {
 		return self.home_team.score + self.away_team.score;
 	}
-
 }
 
 impl fmt::Display for Game {
+	/// Implementation of `Display` trait, allowing it to be converted to a String
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{} - {}", self.home_team.to_string(), self.away_team.to_string())
     }
 }
 
 impl ScoreBoard {
+	/// Finds a match that the given team is currently playing
+	///
+	/// # Arguments
+	///
+	/// * `team_name` - name of the team to search for
+	///
+	/// # Returns
+	///
+	/// * Index to the match in `data` structure that holds the match of a given team
+	///
+	/// # Errors
+	///
+	/// * When the given team is not currently playing any matches
+	///
+	fn find_game_index_of_team(&self, team_name: &String) -> Result<usize, String> {
+		for (id, game) in self.data.iter().enumerate() {
+			if &game.home_team.name == team_name || &game.away_team.name == team_name {
+				return Ok(id)
+			}
+		}
+
+		Err(format!("Couldn't find a game of team {}", team_name))
+	}
+
+	/// Finds a match between the two given
+	///
+	/// # Arguments
+	///
+	/// * `home_name` - name of the home team to search for
+	/// * `away_name` - name of the away team to search for
+	///
+	/// # Returns
+	///
+	/// * Index to the match in `data` structure that holds the match of these two teams
+	///
+	/// # Errors
+	///
+	/// * When the given teams are not currently playing any matches
+	///
 	fn find_game_index(&self, home_name: &String, away_name:&String) -> Result<usize, String> {
 		match self.find_game_index_of_team(&home_name) {
 			Ok(game_index) => {
@@ -146,16 +285,7 @@ impl ScoreBoard {
 		}
 	}
 
-	fn find_game_index_of_team(&self, team_name: &String) -> Result<usize, String> {
-		for (id, game) in self.data.iter().enumerate() {
-			if &game.home_team.name == team_name || &game.away_team.name == team_name {
-				return Ok(id)
-			}
-		}
-
-		Err(format!("Couldn't find a game of team {}", team_name))
-	}
-
+	/// Sorts the `data` structure. Matches with high total scores should come before the ones with low scoring, otherwise matches that started the earliest should come before the matches that started after them
 	fn sort(&mut self) {
 		self.data.sort_by(|a, b| {
 			if a.get_total_score() < b.get_total_score() {
@@ -174,19 +304,31 @@ impl ScoreBoard {
 		});
 	}
 
-	fn check_if_currently_playing(&self, home_name: &String, away_name:&String) -> Result<(), String> {
-		match self.find_game_index_of_team(&home_name) {
-			Ok(_) => return Err(format!("{} is already playing a game", home_name)),
+	/// Checks if any of the two given teams are currently in any matches
+	///
+	/// # Arguments
+	///
+	/// * `name_1` - name of a team
+	/// * `name_2` - name of a team
+	///
+	/// # Errors
+	///
+	/// * When any of the given teams is currently in any active matches
+	///
+	fn check_if_currently_playing(&self, name_1: &String, name_2:&String) -> Result<(), String> {
+		match self.find_game_index_of_team(&name_1) {
+			Ok(_) => return Err(format!("{} is already playing a game", name_1)),
 			Err(_) => ()
 		}
 
-		match self.find_game_index_of_team(&away_name) {
-			Ok(_) => return Err(format!("{} is already playing a game", away_name)),
+		match self.find_game_index_of_team(&name_2) {
+			Ok(_) => return Err(format!("{} is already playing a game", name_2)),
 			Err(_) => ()
 		}
 
 		Ok(())
 	}
+
 }
 
 // ***********
