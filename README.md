@@ -95,12 +95,12 @@ To run tests move to the "scoreboard" directory and run:
 ### Optimization
 
 1. Time stamps are used to verify which match started first. This may be an overkill, but it's cleaner and easier than implementing internal counters, at the cost of being less efficient on the CPU
-2. Vector is used as a data container. There are others collections available, but even the [Rust guide](https://doc.rust-lang.org/std/collections/index.html) suggests sticking to the vector. Alternatives could be considered to improve efficiency, but they would need profiling and real world usage of the library
+2. `Vec` is used as a data container. There are others collections available, but even the [Rust guide](https://doc.rust-lang.org/std/collections/index.html) suggests sticking to the good, reliable vector. Alternatives could be considered to improve efficiency, but they would need profiling and real world usage of the library
 3. Data is sorted after each addition, score change and removal. The sorting could be moved to the summary display method, so it would "happen" only once in the code, but this has disadvantages:
 	- `get_summary()` method would have to be mutable and change the state of the score board, which is a bad design
 	- `get_summary()` is expected to be called much more often than all the other API functions combined, so it has to be quick and simple. Adding sorting to it can have serious time impact for a large number of concurrent matches
-	- Current implementation of `sort()` does extremely well with collections that are partly sorted or have stretches of sorted elements ([source](https://doc.rust-lang.org/std/primitive.slice.html#current-implementation-8)). As such, it should have little impact on the functions that use it now, as their changes apply to single matches
-4. Alternatives to `Vec` and `push()` could be considered that might allow to skip sorting in some cases. A newly created match has the lowes possible total score and the freshest timestamp, so sorting on `start_game()` could be probably omitted, but this requires more analysis.
+	- Current implementation of `sort()` does extremely well with collections that are partly sorted or have stretches of sorted elements ([source](https://doc.rust-lang.org/std/primitive.slice.html#current-implementation-8)). As such, it should have little impact on the functions that use it now, as their changes apply to single matches and leave the rest of the collection sorted
+4. Alternatives to `Vec` and `push()` could be considered that might allow to skip sorting in some cases. A newly created match has the lowes possible total score and the freshest timestamp, so sorting on `start_game()` could be probably omitted, but this requires more analysis
 
 ## Issues
 
