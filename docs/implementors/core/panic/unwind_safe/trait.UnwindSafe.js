@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"scoreboard":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.70.0/core/panic/unwind_safe/trait.UnwindSafe.html\" title=\"trait core::panic::unwind_safe::UnwindSafe\">UnwindSafe</a> for <a class=\"struct\" href=\"scoreboard/struct.ScoreBoard.html\" title=\"struct scoreboard::ScoreBoard\">ScoreBoard</a>",1,["scoreboard::ScoreBoard"]]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
