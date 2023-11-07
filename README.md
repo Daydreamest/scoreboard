@@ -59,7 +59,7 @@ Move to the "scoreboard" directory and run:
 
 `> cargo build --release`
 
-On the first execution Cargo may download dependencies and libraries. After that, the library will be compiled to a binary:
+On the first execution Cargo will download dependencies (ex. the logging crate). After that, the library will be compiled to a binary:
 
 `scoreboard/target/release/libscoreboard.rlib`
 

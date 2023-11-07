@@ -5,6 +5,8 @@ use std::string::ToString;
 use std::time::Instant;
 use std::vec::Vec;
 
+use log::{trace, warn};
+
 // *********************
 // Public API functions
 // *********************
@@ -49,9 +51,10 @@ impl ScoreBoard {
 		let home_name = home.to_string();
 		let away_name = away.to_string();
 
-		println!("Function start_game called with parameters: '{0}' and '{1}'", home_name, away_name);
+		trace!("Trying to start a game for teams: '{}' and '{}'", home_name, away_name);
 
 		if home_name == away_name {
+			warn!("{} cannot play with itself", home_name);
 			return Err(format!("{} cannot play with itself", home_name));
 		}
 
@@ -64,6 +67,8 @@ impl ScoreBoard {
 				start_time: Instant::now(),
 			}
 		);
+
+		trace!("Game started");
 
 		self.sort();
 
@@ -99,7 +104,7 @@ impl ScoreBoard {
 		let home_name = home.to_string();
 		let away_name = away.to_string();
 
-		println!("Function update_score called with parameters: {}, {}, {}, {}", home_name, new_home_score, away_name, new_away_score);
+		trace!("Updating score to: {} {} - {} {}", home_name, new_home_score, away_name, new_away_score);
 
 		match self.find_game_index(&home_name, &away_name) {
 			Ok(game_index) => {
@@ -111,8 +116,13 @@ impl ScoreBoard {
 
 				let _ = std::mem::replace(&mut self.data[game_index], new_game_result);
 			},
-			Err(_) => return Err(String::from("Couldn't find a game for update")),
+			Err(_) => {
+				warn!("Couldn't find a game for update");
+				return Err(String::from("Couldn't find a game for update"))
+			},
 		}
+
+		trace!("Update successful");
 
 		self.sort();
 
@@ -146,12 +156,17 @@ impl ScoreBoard {
 		let home_name = home.to_string();
 		let away_name = away.to_string();
 
-		println!("Function finish_game called with parameters: '{0}' and '{1}'", home_name, away_name);
+		trace!("Ending a game bewteen '{}' and '{}'", home_name, away_name);
 
 		match self.find_game_index(&home_name, &away_name) {
 			Ok(game_index) => { let _ = self.data.remove(game_index); },
-			Err(_) => return Err(String::from("Couldn't find a game for removal")),
+			Err(_) => {
+				warn!("Couldn't find a game for removal");
+				return Err(String::from("Couldn't find a game for removal"))
+			},
 		}
+
+		trace!("Game removed successfully");
 
 		self.sort();
 
@@ -176,7 +191,7 @@ impl ScoreBoard {
 	/// assert_eq!(summary, expected_result);
 	/// ```
 	pub fn get_summary(&self) -> Vec<String> {
-		println!("Function get_summary called");
+		trace!("Getting the score board summary");
 		
 		let mut result = Vec::new();
 
@@ -247,11 +262,16 @@ impl ScoreBoard {
 	/// * When the given team is not currently playing any matches
 	///
 	fn find_game_index_of_team(&self, team_name: &String) -> Result<usize, String> {
+		trace!("Looking for {} in the score board", team_name);
+
 		for (id, game) in self.data.iter().enumerate() {
 			if &game.home_team.name == team_name || &game.away_team.name == team_name {
+				trace!("Team {} is currently playing a game", team_name);
 				return Ok(id)
 			}
 		}
+
+		trace!("Couldn't find a game of team {}", team_name);
 
 		Err(format!("Couldn't find a game of team {}", team_name))
 	}
@@ -272,21 +292,30 @@ impl ScoreBoard {
 	/// * When the given teams are not currently playing any matches
 	///
 	fn find_game_index(&self, home_name: &String, away_name:&String) -> Result<usize, String> {
+		trace!("Looking for a game between {} and {}", home_name, away_name);
+
 		match self.find_game_index_of_team(&home_name) {
 			Ok(game_index) => {
 				let game = self.data.get(game_index).unwrap();
 				if &game.home_team.name == home_name && &game.away_team.name == away_name {
+					trace!("Teams {} and {} are playing a game now", home_name, away_name);
 					return Ok(game_index)
 				} else {
+					trace!("Team {} isn't playing with {} currently", home_name, away_name);
 					return Err(format!("Team {} isn't playing with {} currently", home_name, away_name))
 				}
 			},
-			Err(_) => return Err(format!("Couldn't find a game of teams: {} and {}", home_name, away_name)),
+			Err(_) => {
+				trace!("Couldn't find a game of teams: {} and {}", home_name, away_name);
+				return Err(format!("Couldn't find a game of teams: {} and {}", home_name, away_name))
+			},
 		}
 	}
 
 	/// Sorts the `data` structure. Matches with high total scores should come before the ones with low scoring, otherwise matches that started the earliest should come before the matches that started after them
 	fn sort(&mut self) {
+		trace!("Sorting the games");
+
 		self.data.sort_by(|a, b| {
 			if a.get_total_score() < b.get_total_score() {
 				Ordering::Greater	// Because reverse order is needed, from greatest to smallest
@@ -302,6 +331,8 @@ impl ScoreBoard {
 				}
 			}
 		});
+
+		trace!("Games sorted");
 	}
 
 	/// Checks if any of the two given teams are currently in any matches
@@ -316,15 +347,25 @@ impl ScoreBoard {
 	/// * When any of the given teams is currently in any active matches
 	///
 	fn check_if_currently_playing(&self, name_1: &String, name_2:&String) -> Result<(), String> {
+		trace!("Checking if teams {} and {} are currently playing a game", name_1, name_2);
+
 		match self.find_game_index_of_team(&name_1) {
-			Ok(_) => return Err(format!("{} is already playing a game", name_1)),
+			Ok(_) => {
+				warn!("Team {} is currently playing a game", name_1);
+				return Err(format!("{} is currently playing a game", name_1))
+			},
 			Err(_) => ()
 		}
 
 		match self.find_game_index_of_team(&name_2) {
-			Ok(_) => return Err(format!("{} is already playing a game", name_2)),
+			Ok(_) => {
+				warn!("Team {} is currently playing a game", name_2);
+				return Err(format!("{} is currently playing a game", name_2));
+			}
 			Err(_) => ()
 		}
+
+		trace!("Teams {} and {} are not playing any games", name_1, name_2);
 
 		Ok(())
 	}
@@ -363,7 +404,7 @@ mod tests {
 	}
 
 	fn get_team_already_paying_message(team_name: &str) -> String {
-		return format!("{} is already playing a game", team_name);
+		return format!("{} is currently playing a game", team_name);
 	}
 
 	#[test]
