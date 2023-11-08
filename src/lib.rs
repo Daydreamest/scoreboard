@@ -894,5 +894,44 @@ mod tests {
 		assert!(result_1.err().is_some_and(|result| result == get_team_already_paying_message(HOME_TEAM_NAME_1)));
 		assert_eq!(result_2, expected_summary);
 	}
-	
+
+	#[test]
+	fn grand_example() {
+		let expected_summary = vec![
+			String::from("Uruguay 6 - Italy 6"),
+			String::from("Spain 10 - Brazil 2"),
+			String::from("Mexico 0 - Canada 5"),
+			String::from("Argentina 3 - Australia 1"),
+			String::from("Germany 2 - France 2"),
+		];
+
+		let mut sb = ScoreBoard::new();
+		sb.start_game("Mexico", "Canada").unwrap();
+		sb.update_score("Mexico", 0, "Canada", 1).unwrap();
+		sb.start_game("Spain", "Brazil").unwrap();
+		sb.update_score("Mexico", 0, "Canada", 2).unwrap();
+		sb.update_score("Spain", 1, "Brazil", 1).unwrap();
+		sb.update_score("Spain", 1, "Brazil", 2).unwrap();
+		sb.start_game("Germany", "France").unwrap();
+		sb.update_score("Mexico", 0, "Canada", 3).unwrap();
+		sb.update_score("Germany", 1, "France", 0).unwrap();
+		sb.update_score("Mexico", 0, "Canada", 4).unwrap();
+		sb.update_score("Germany", 1, "France", 1).unwrap();
+		sb.update_score("Germany", 1, "France", 2).unwrap();
+		sb.start_game("Uruguay", "Italy").unwrap();
+		sb.start_game("Argentina", "Australia").unwrap();
+		sb.update_score("Uruguay", 1, "Italy", 1).unwrap();
+		sb.update_score("Germany", 2, "France", 2).unwrap();
+		sb.update_score("Uruguay", 2, "Italy", 2).unwrap();
+		sb.update_score("Argentina", 1, "Australia", 1).unwrap();
+		sb.update_score("Mexico", 0, "Canada", 5).unwrap();
+		sb.update_score("Uruguay", 3, "Italy", 3).unwrap();
+		sb.update_score("Argentina", 3, "Australia", 1).unwrap();
+		sb.update_score("Spain", 10, "Brazil", 2).unwrap();
+		sb.update_score("Uruguay", 6, "Italy", 6).unwrap();
+
+		let result = sb.get_summary();
+
+		assert_eq!(result, expected_summary);
+	}
 }
