@@ -85,8 +85,6 @@ Copy the `scoreboard.rs` file to your project and include the module anywhere yo
 
 `use scoreboard::*;`
 
-There is an exmaple provided in `scoreboard/src/bin/example.rs` that shows a typical usage of the library.
-
 #### As compiled Rust library with rustc compiler
 
 Copy compiled `libscoreboard.rlib` file to your project and add a flag to your compilation options:
