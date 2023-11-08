@@ -1,7 +1,10 @@
+//! # Score board
+//!
+//! Provides a simple score board for following the results of the currently played games in a World Cup
+
 use std::cmp::Ordering;
 use std::fmt;
-use std::string::String;
-use std::string::ToString;
+use std::string::{String, ToString};
 use std::time::Instant;
 use std::vec::Vec;
 
