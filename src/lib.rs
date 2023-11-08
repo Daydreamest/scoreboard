@@ -323,9 +323,9 @@ impl ScoreBoard {
 				Ordering::Less		// Because reverse order is needed, from greatest to smallest
 			} else {
 				if a.start_time < b.start_time {
-					Ordering::Less		// Because second ordering is normal, from smallest timestamp to greatest
-				} else if a.start_time < b.start_time {
-					Ordering::Greater	// Because second ordering is normal, from smallest timestamp to greatest
+					Ordering::Greater	// TODO Because second ordering is also reversed, from greatest timestamp (i.e. freshest game) to lowest
+				} else if a.start_time > b.start_time {
+					Ordering::Less		// TODO Because second ordering is also reversed, from greatest timestamp (i.e. freshest game) to lowest
 				} else {
 					Ordering::Equal
 				}
@@ -450,14 +450,14 @@ mod tests {
 		assert!(result_2.is_ok());
 		assert_eq!(sb.data.len(), 2);
 		let Game { home_team: h_1, away_team: a_1, start_time: _} = sb.data.get(0).expect("First element is not available.");
-		assert_eq!(h_1.name, HOME_TEAM_NAME_1);
+		assert_eq!(h_1.name, HOME_TEAM_NAME_2);
 		assert_eq!(h_1.score, 0);
-		assert_eq!(a_1.name, AWAY_TEAM_NAME_1);
+		assert_eq!(a_1.name, AWAY_TEAM_NAME_2);
 		assert_eq!(a_1.score, 0);
 		let Game { home_team: h_2, away_team: a_2, start_time: _} = sb.data.get(1).expect("Second element is not available.");
-		assert_eq!(h_2.name, HOME_TEAM_NAME_2);
+		assert_eq!(h_2.name, HOME_TEAM_NAME_1);
 		assert_eq!(h_2.score, 0);
-		assert_eq!(a_2.name, AWAY_TEAM_NAME_2);
+		assert_eq!(a_2.name, AWAY_TEAM_NAME_1);
 		assert_eq!(a_2.score, 0);
 	}
 
@@ -490,8 +490,8 @@ mod tests {
 		assert_eq!(result.len(), 2);
 		let r_1 = result.get(0).expect("First element is not available.");
 		let r_2 = result.get(1).expect("Second element is not available.");
-		assert_eq!(r_1, SCORELESS_GAME_1);
-		assert_eq!(r_2, SCORELESS_GAME_2);
+		assert_eq!(r_1, SCORELESS_GAME_2);
+		assert_eq!(r_2, SCORELESS_GAME_1);
 	}
 
 	#[test]
@@ -606,7 +606,7 @@ mod tests {
 
 	#[test]
 	fn removing_the_mid_game_works() {
-		let expected_summary = vec![SCORELESS_GAME_1, SCORELESS_GAME_2];
+		let expected_summary = vec![SCORELESS_GAME_2, SCORELESS_GAME_1];
 
 		let mut sb = ScoreBoard::new();
 		sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
@@ -811,15 +811,15 @@ mod tests {
 
 	#[test]
 	fn secondary_sorting_by_start_time_works() {
-		let expected_summary_1 = vec![format!("{} 1 - {} 1", HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2), String::from(SCORELESS_GAME_1)];
-		let expected_summary_2 = vec![format!("{} 1 - {} 1", HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1), format!("{} 1 - {} 1", HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2)];
+		let expected_summary_1 = vec![format!("{} 1 - {} 1", HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1), String::from(SCORELESS_GAME_2)];
+		let expected_summary_2 = vec![format!("{} 1 - {} 1", HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2), format!("{} 1 - {} 1", HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1)];
 
 		let mut sb = ScoreBoard::new();
 		sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
 		sb.start_game(HOME_TEAM_NAME_2, AWAY_TEAM_NAME_2).expect("Couldn't create the second game");
-		sb.update_score(HOME_TEAM_NAME_2, 1, AWAY_TEAM_NAME_2, 1).expect("Couldn't update the second game");
+		sb.update_score(HOME_TEAM_NAME_1, 1, AWAY_TEAM_NAME_1, 1).expect("Couldn't update the eariler game");
 		let result_1 = sb.get_summary();
-		sb.update_score(HOME_TEAM_NAME_1, 1, AWAY_TEAM_NAME_1, 1).expect("Couldn't update the first game");
+		sb.update_score(HOME_TEAM_NAME_2, 1, AWAY_TEAM_NAME_2, 1).expect("Couldn't update the later game");
 		let result_2 = sb.get_summary();
 
 		assert_eq!(result_1, expected_summary_1);
@@ -883,7 +883,7 @@ mod tests {
 
 	#[test]
 	fn match_will_not_start_if_both_teams_are_already_playing() {
-		let expected_summary = vec![String::from(SCORELESS_GAME_1), String::from(SCORELESS_GAME_2)];
+		let expected_summary = vec![String::from(SCORELESS_GAME_2), String::from(SCORELESS_GAME_1)];
 
 		let mut sb = ScoreBoard::new();
 		sb.start_game(HOME_TEAM_NAME_1, AWAY_TEAM_NAME_1).expect("Couldn't create the first game");
@@ -894,5 +894,5 @@ mod tests {
 		assert!(result_1.err().is_some_and(|result| result == get_team_already_paying_message(HOME_TEAM_NAME_1)));
 		assert_eq!(result_2, expected_summary);
 	}
-
+	
 }
