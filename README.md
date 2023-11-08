@@ -95,7 +95,7 @@ Copy compiled `libscoreboard.rlib` file to your project and add a flag to your c
 
 Add the following line in `Cargo.toml` file under `[dependencies]`:
 
-`scoreboard_world_cup = "0.1.0"`
+`scoreboard_world_cup = "0.1.1"`
 
 ### Testing
 

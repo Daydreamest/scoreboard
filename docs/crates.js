@@ -1,1 +1,1 @@
-window.ALL_CRATES = ["example","scoreboard"];
+window.ALL_CRATES = ["example","log","scoreboard","scoreboard_world_cup"];
