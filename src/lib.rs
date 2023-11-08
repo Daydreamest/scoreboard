@@ -5,7 +5,7 @@ use std::string::ToString;
 use std::time::Instant;
 use std::vec::Vec;
 
-use log::{trace, warn};
+use log::{debug, trace, warn};
 
 // *********************
 // Public API functions
@@ -266,12 +266,12 @@ impl ScoreBoard {
 
 		for (id, game) in self.data.iter().enumerate() {
 			if &game.home_team.name == team_name || &game.away_team.name == team_name {
-				trace!("Team {} is currently playing a game", team_name);
+				debug!("Team {} is currently playing a game", team_name);
 				return Ok(id)
 			}
 		}
 
-		trace!("Couldn't find a game of team {}", team_name);
+		debug!("Couldn't find a game of team {}", team_name);
 
 		Err(format!("Couldn't find a game of team {}", team_name))
 	}
@@ -298,15 +298,15 @@ impl ScoreBoard {
 			Ok(game_index) => {
 				let game = self.data.get(game_index).unwrap();
 				if &game.home_team.name == home_name && &game.away_team.name == away_name {
-					trace!("Teams {} and {} are playing a game now", home_name, away_name);
+					debug!("Teams {} and {} are playing a game now", home_name, away_name);
 					return Ok(game_index)
 				} else {
-					trace!("Team {} isn't playing with {} currently", home_name, away_name);
+					debug!("Team {} isn't playing with {} currently", home_name, away_name);
 					return Err(format!("Team {} isn't playing with {} currently", home_name, away_name))
 				}
 			},
 			Err(_) => {
-				trace!("Couldn't find a game of teams: {} and {}", home_name, away_name);
+				debug!("Couldn't find a game of teams: {} and {}", home_name, away_name);
 				return Err(format!("Couldn't find a game of teams: {} and {}", home_name, away_name))
 			},
 		}
@@ -351,7 +351,7 @@ impl ScoreBoard {
 
 		match self.find_game_index_of_team(&name_1) {
 			Ok(_) => {
-				warn!("Team {} is currently playing a game", name_1);
+				debug!("Team {} is currently playing a game", name_1);
 				return Err(format!("{} is currently playing a game", name_1))
 			},
 			Err(_) => ()
@@ -359,7 +359,7 @@ impl ScoreBoard {
 
 		match self.find_game_index_of_team(&name_2) {
 			Ok(_) => {
-				warn!("Team {} is currently playing a game", name_2);
+				debug!("Team {} is currently playing a game", name_2);
 				return Err(format!("{} is currently playing a game", name_2));
 			}
 			Err(_) => ()
