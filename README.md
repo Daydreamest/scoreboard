@@ -103,6 +103,8 @@ To run tests move to the "scoreboard" directory and run:
 
 `> cargo test`
 
+There are a total of 39 unit/module tests and 4 documentation tests
+
 ## Possible additional features
 
 ### API
