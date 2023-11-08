@@ -6,7 +6,7 @@ authors = ["Daydreamest"]
 license = "MIT"
 description = "Simple score board for following the results of the currently played games in a World Cup"
 documentation = "https://daydreamest.github.io/scoreboard/scoreboard/"
-homepage = "https://daydreamest.github.io/scoreboard/scoreboard/"
+homepage = "https://crates.io/crates/scoreboard_world_cup"
 repository = "https://github.com/Daydreamest/scoreboard"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

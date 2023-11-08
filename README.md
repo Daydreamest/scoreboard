@@ -57,7 +57,7 @@ Run this command to generate documentation and open it:
 
 ### Online
 
-The generated documentation is available on GitHub Pages under [daydreamest.github.io](https://daydreamest.github.io/scoreboard/scoreboard/)
+The generated documentation is available on GitHub Pages under [daydreamest.github.io](https://daydreamest.github.io/scoreboard/scoreboard/) or on [crates.io](https://crates.io/crates/scoreboard_world_cup)
 
 ## Installation and usage
 
@@ -90,6 +90,12 @@ Copy the `scoreboard.rs` file to your project and include the module anywhere yo
 Copy compiled `libscoreboard.rlib` file to your project and add a flag to your compilation options:
 
 `rustc main.rs --extern scoreboard=libscoreboard.rlib`
+
+#### As cargo library
+
+Add the following line in `Cargo.toml` file under `[dependencies]`:
+
+`scoreboard_world_cup = "0.1.0"`
 
 ### Testing
 
