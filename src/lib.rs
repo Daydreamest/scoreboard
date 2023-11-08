@@ -44,7 +44,7 @@ impl ScoreBoard {
 	/// let mut expected_result: Vec<String> = Vec::new();
 	/// expected_result.push(String::from("Japan 0 - Indonesia 0"));
 	///
-	/// let mut sb = scoreboard::ScoreBoard::new();
+	/// let mut sb = scoreboard_world_cup::ScoreBoard::new();
 	/// sb.start_game("Japan", "Indonesia");
 	/// let summary = sb.get_summary();
 	/// assert_eq!(summary, expected_result);
@@ -97,7 +97,7 @@ impl ScoreBoard {
 	/// let mut expected_result: Vec<String> = Vec::new();
 	/// expected_result.push(String::from("Japan 2 - Indonesia 0"));
 	///
-	/// let mut sb = scoreboard::ScoreBoard::new();
+	/// let mut sb = scoreboard_world_cup::ScoreBoard::new();
 	/// sb.start_game("Japan", "Indonesia");
 	/// sb.update_score("Japan", 2, "Indonesia", 0);
 	/// let summary = sb.get_summary();
@@ -148,7 +148,7 @@ impl ScoreBoard {
 	/// ```
 	/// let mut expected_result: Vec<String> = Vec::new();
 	///
-	/// let mut sb = scoreboard::ScoreBoard::new();
+	/// let mut sb = scoreboard_world_cup::ScoreBoard::new();
 	/// sb.start_game("Japan", "Indonesia");
 	/// sb.update_score("Japan", 2, "Indonesia", 0);
 	/// sb.finish_game("Japan", "Indonesia");
@@ -188,7 +188,7 @@ impl ScoreBoard {
 	/// let mut expected_result: Vec<String> = Vec::new();
 	/// expected_result.push(String::from("Japan 0 - Indonesia 0"));
 	///
-	/// let mut sb = scoreboard::ScoreBoard::new();
+	/// let mut sb = scoreboard_world_cup::ScoreBoard::new();
 	/// sb.start_game("Japan", "Indonesia");
 	/// let summary = sb.get_summary();
 	/// assert_eq!(summary, expected_result);
